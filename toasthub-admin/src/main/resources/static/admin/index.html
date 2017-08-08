@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+	<title>Cborg Customer Admin</title>
+	<script type="text/javascript" src="/libs/jquery/jquery-3.1.1.min.js"></script>
+	<script type="text/javascript" src="/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+	<script src="/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/libs/jquery-sparkline/jquery.sparkline.min.js"></script>
+	<script type="text/javascript" src="/libs/moment/moment.min.js"></script>
+	<script type="text/javascript" src="/libs/bootstrap-daterangepicker/daterangepicker.js"></script>
+	<!-- Flot -->
+    <script src="/libs/flot/jquery.flot.js"></script>
+    <script src="/libs/flot/jquery.flot.pie.js"></script>
+    <script src="/libs/flot/jquery.flot.time.js"></script>
+    <script src="/libs/flot/jquery.flot.stack.js"></script>
+    <script src="/libs/flot/jquery.flot.resize.js"></script>
+	<!-- DateJS -->
+    <script src="/libs/DateJS/date.js"></script>
+	<!-- Select2 -->
+    <script src="/libs/select2/4.0.3/js/select2.full.min.js"></script>
+	<script src="/1.0/js/toastHub-core.js"></script>
+	<script type="text/javascript" src="/1.0/js/toastHub-sideMenu.js"></script>
+	<script type="text/javascript" src="/1.0/js/toastHub-topMenu.js"></script>
+	<script type="text/javascript" src="/1.0/admin/js/toastHub-users.js"></script>
+	<script type="text/javascript" src="/1.0/admin/js/toastHub-roles.js"></script>
+	<script type="text/javascript" src="/1.0/admin/js/toastHub-menu.js"></script>
+	<script type="text/javascript" src="/1.0/js/toastHub-form.js"></script>
+	<script type="text/javascript" src="/1.0/admin/js/toastHub-preference.js"></script>
+	<script type="text/javascript" src="/1.0/admin/js/toastHub-application.js"></script>
+	<script type="text/javascript" src="/1.0/admin/js/toastHub-clientDomain.js"></script>
+	<script type="text/javascript" src="/1.0/admin/js/toastHub-permissions.js"></script>
+	<script type="text/javascript" src="/1.0/admin/js/toastHub-language.js"></script>
+	<script type="text/javascript" src="/1.0/admin/js/toastHub-serviceCrawler.js"></script>
+	<script type="text/javascript" src="/1.0/admin/js/toastHub-adminLayout.js"></script>
+	<script type="text/javascript" src="/1.0/admin/js/toastHub-index.js"></script>
+	<script type="text/javascript" src="/1.0/js/toastHub-panel.js"></script>
+	<script type="text/javascript" src="/1.0/js/toastHub-dashboard.js"></script>
+	<script type="text/javascript" src="/1.0/js/toastHub-contacts.js"></script>
+	<script type="text/javascript" src="/1.0/js/toastHub-accordion.js"></script>
+	<script type="text/javascript" src="/1.0/js/toastHub-tab.js"></script>
+	<script type="text/javascript" src="/1.0/js/toastHub-modal.js"></script>
+	<script type="text/javascript" src="/1.0/js/toastHub-table.js"></script>
+	
+	<link href="/libs/jqueryui/1.10.3/themes/base/jquery-ui.css" rel="stylesheet">
+	<link href="/libs/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/libs/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+	<!-- Select2 -->
+    <link href="/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet">
+    <!-- Custom Fonts -->
+    <link href="/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+	<link href="/1.0/admin/css/custom.css" rel="stylesheet">
+	
+	<script type="text/javascript">
+		jQuery.noConflict();
+		jQuery.ajaxSetup({cache:false});
+		if(window.location.search) {
+			toastHub.setParamMap(toastHub.utils.queryString());
+			}
+		toastHub.ajaxFunc = "admin";
+   		toastHub.service = "ADMIN_SVC";
+   		toastHub.load({"restUrl":"/api/"});
+	    jQuery(document).ready(function() {
+			window.onhashchange = function(evt){
+				   var updatedHash = evt.newURL.split("#")[1];
+				   console.log("hash " + updatedHash);
+				   //toastHub.ready({hash:updatedHash});
+				};
+				// init page
+			   toastHub.ready({code:"page"});
+		});	
+    </script>
+</head>
+<body id="page-top" class="nav-md">
+</body>
+</html>
