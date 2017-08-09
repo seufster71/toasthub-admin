@@ -23,7 +23,7 @@ import org.toasthub.admin.security.repository.UsersAdminDao;
 import org.toasthub.core.general.handler.ServiceProcessor;
 import org.toasthub.core.general.model.BaseEntity;
 import org.toasthub.core.general.service.UtilSvc;
-import org.toasthub.core.preference.model.AppCachePage;
+import org.toasthub.core.preference.model.AppCachePageUtil;
 import org.toasthub.security.model.User;
 import org.toasthub.security.service.UsersSvcImpl;
 import org.toasthub.core.general.model.RestRequest;
@@ -41,7 +41,7 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 	UtilSvc utilSvc;
 	
 	@Autowired 
-	AppCachePage appCachePage;
+	AppCachePageUtil appCachePageUtil;
 
 	public void process(RestRequest request, RestResponse response) {
 		String action = (String) request.getParams().get(BaseEntity.ACTION);
@@ -51,7 +51,7 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 		case "INIT":
 			this.initParams(request);
 			request.addParam("appPageParamLoc", "response");
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
 			this.itemColumns(request, response);
@@ -63,7 +63,7 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 		case "LIST":
 			this.initParams(request);
 			request.addParam("appPageParamLoc", "response");
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
 			this.itemColumns(request, response);
@@ -77,7 +77,7 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 			break;
 		case "EDIT":
 			// get form info
-			appCachePage.getPageInfo(request, response);
+			appCachePageUtil.getPageInfo(request, response);
 			// get item info
 			this.item(request, response);
 			break;
@@ -88,7 +88,7 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 			this.delete(request, response);
 			break;
 		case "SAVE":
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			this.save(request, response);
 			break;
 		case "SAVE_ROLE":

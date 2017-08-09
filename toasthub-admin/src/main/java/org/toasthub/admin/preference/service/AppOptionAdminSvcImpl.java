@@ -25,7 +25,7 @@ import org.toasthub.core.general.model.BaseEntity;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.general.service.UtilSvc;
-import org.toasthub.core.preference.model.AppCachePage;
+import org.toasthub.core.preference.model.AppCachePageUtil;
 import org.toasthub.core.preference.model.AppPageOptionName;
 import org.toasthub.core.preference.service.AppOptionSvcImpl;
 
@@ -37,7 +37,7 @@ public class AppOptionAdminSvcImpl extends AppOptionSvcImpl implements ServicePr
 	AppOptionAdminDao appOptionAdminDao;
 	
 	@Autowired 
-	AppCachePage appCachePage;
+	AppCachePageUtil appCachePageUtil;
 	
 	@Autowired 
 	UtilSvc utilSvc;
@@ -46,7 +46,7 @@ public class AppOptionAdminSvcImpl extends AppOptionSvcImpl implements ServicePr
 	public void process(RestRequest request, RestResponse response) {
 		String action = (String) request.getParams().get(BaseEntity.ACTION);
 		
-		appCachePage.getPageInfo(request,response);
+		appCachePageUtil.getPageInfo(request,response);
 		Long count = 0l;
 		switch (action) {
 		case "INIT":
@@ -84,7 +84,7 @@ public class AppOptionAdminSvcImpl extends AppOptionSvcImpl implements ServicePr
 		try {
 			appOptionAdminDao.delete(request, response);
 			// reset
-			appCachePage.clearAppPageOptionCache();
+			appCachePageUtil.clearAppPageOptionCache();
 			
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Delete Successful", response);
 		} catch (Exception e) {
@@ -121,7 +121,7 @@ public class AppOptionAdminSvcImpl extends AppOptionSvcImpl implements ServicePr
 									
 			appOptionAdminDao.save(request, response);
 			// reset
-			appCachePage.clearAppPageOptionCache();
+			appCachePageUtil.clearAppPageOptionCache();
 						
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Save Successful", response);
 		} catch (Exception e) {

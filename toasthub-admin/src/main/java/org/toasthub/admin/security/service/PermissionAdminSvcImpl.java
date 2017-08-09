@@ -26,7 +26,7 @@ import org.toasthub.core.general.model.BaseEntity;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.general.service.UtilSvc;
-import org.toasthub.core.preference.model.AppCachePage;
+import org.toasthub.core.preference.model.AppCachePageUtil;
 import org.toasthub.security.model.Permission;
 import org.toasthub.security.service.PermissionSvcImpl;
 
@@ -38,7 +38,7 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 	PermissionAdminDao permissionAdminDao;
 	
 	@Autowired 
-	AppCachePage appCachePage;
+	AppCachePageUtil appCachePageUtil;
 	
 	@Autowired 
 	UtilSvc utilSvc;
@@ -51,7 +51,7 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 		switch (action) {
 		case "INIT":
 			request.addParam("appPageParamLoc", "response");
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -61,7 +61,7 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 			break;
 		case "LIST":
 			request.addParam("appPageParamLoc", "response");
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -79,7 +79,7 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 			this.delete(request, response);
 			break;
 		case "SAVE":
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			this.save(request, response);
 			break;
 		default:

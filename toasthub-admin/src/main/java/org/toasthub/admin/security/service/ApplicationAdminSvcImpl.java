@@ -25,7 +25,7 @@ import org.toasthub.core.general.model.BaseEntity;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.general.service.UtilSvc;
-import org.toasthub.core.preference.model.AppCachePage;
+import org.toasthub.core.preference.model.AppCachePageUtil;
 import org.toasthub.security.model.Application;
 import org.toasthub.security.service.ApplicationSvcImpl;
 
@@ -37,7 +37,7 @@ public class ApplicationAdminSvcImpl extends ApplicationSvcImpl implements Servi
 	ApplicationAdminDao applicationAdminDao;
 	
 	@Autowired 
-	AppCachePage appCachePage;
+	AppCachePageUtil appCachePageUtil;
 	
 	@Autowired 
 	UtilSvc utilSvc;
@@ -50,7 +50,7 @@ public class ApplicationAdminSvcImpl extends ApplicationSvcImpl implements Servi
 		switch (action) {
 		case "INIT":
 			request.addParam("appPageParamLoc", "response");
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -60,7 +60,7 @@ public class ApplicationAdminSvcImpl extends ApplicationSvcImpl implements Servi
 			break;
 		case "LIST":
 			request.addParam("appPageParamLoc", "response");
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -75,7 +75,7 @@ public class ApplicationAdminSvcImpl extends ApplicationSvcImpl implements Servi
 			this.delete(request, response);
 			break;
 		case "SAVE":
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			this.save(request, response);
 			break;
 		default:

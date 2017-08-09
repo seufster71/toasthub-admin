@@ -26,7 +26,7 @@ import org.toasthub.core.general.model.BaseEntity;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.general.service.UtilSvc;
-import org.toasthub.core.preference.model.AppCachePage;
+import org.toasthub.core.preference.model.AppCachePageUtil;
 import org.toasthub.security.model.Role;
 import org.toasthub.security.service.RoleSvcImpl;
 
@@ -38,7 +38,7 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 	RoleAdminDao roleAdminDao;
 	
 	@Autowired 
-	AppCachePage appCachePage;
+	AppCachePageUtil appCachePageUtil;
 	
 	@Autowired 
 	UtilSvc utilSvc;
@@ -51,7 +51,7 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 		switch (action) {
 		case "INIT":
 			request.addParam("appPageParamLoc", "response");
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -61,7 +61,7 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 			break;
 		case "LIST":
 			request.addParam("appPageParamLoc", "response");
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -79,7 +79,7 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 			this.delete(request, response);
 			break;
 		case "SAVE":
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			this.save(request, response);
 			break;
 		case "SAVE_PERMISSION":

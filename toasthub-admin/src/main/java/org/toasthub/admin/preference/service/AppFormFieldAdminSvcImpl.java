@@ -25,7 +25,7 @@ import org.toasthub.core.general.model.BaseEntity;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.general.service.UtilSvc;
-import org.toasthub.core.preference.model.AppCachePage;
+import org.toasthub.core.preference.model.AppCachePageUtil;
 import org.toasthub.core.preference.model.AppPageFormFieldName;
 import org.toasthub.core.preference.service.AppFormFieldSvcImpl;
 
@@ -37,7 +37,7 @@ public class AppFormFieldAdminSvcImpl extends AppFormFieldSvcImpl implements Ser
 	AppFormFieldAdminDao appFormFieldAdminDao;
 	
 	@Autowired 
-	AppCachePage appCachePage;
+	AppCachePageUtil appCachePageUtil;
 	
 	@Autowired 
 	UtilSvc utilSvc;
@@ -46,7 +46,7 @@ public class AppFormFieldAdminSvcImpl extends AppFormFieldSvcImpl implements Ser
 	public void process(RestRequest request, RestResponse response) {
 		String action = (String) request.getParams().get(BaseEntity.ACTION);
 		
-		appCachePage.getPageInfo(request,response);
+		appCachePageUtil.getPageInfo(request,response);
 		Long count = 0l;
 		switch (action) {
 		case "INIT":
@@ -88,7 +88,7 @@ public class AppFormFieldAdminSvcImpl extends AppFormFieldSvcImpl implements Ser
 		try {
 			appFormFieldAdminDao.delete(request, response);
 			// reset cache
-			appCachePage.clearAppPageFormFieldCache();
+			appCachePageUtil.clearAppPageFormFieldCache();
 			
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Delete Successful", response);
 		} catch (Exception e) {
@@ -125,7 +125,7 @@ public class AppFormFieldAdminSvcImpl extends AppFormFieldSvcImpl implements Ser
 			
 			appFormFieldAdminDao.save(request, response);
 			// reset cache
-			appCachePage.clearAppPageFormFieldCache();
+			appCachePageUtil.clearAppPageFormFieldCache();
 			
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Save Successful", response);
 		} catch (Exception e) {

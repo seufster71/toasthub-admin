@@ -24,16 +24,18 @@ import org.toasthub.core.general.model.BaseEntity;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.general.service.UtilSvc;
-import org.toasthub.core.preference.model.AppCachePage;
+import org.toasthub.core.preference.model.AppCachePageUtil;
 import org.toasthub.core.system.model.ClientDomain;
 import org.toasthub.core.system.service.ClientDomainSvcImpl;
 
 @Service("ClientDomainAdminSvc")
 public class ClientDomainAdminSvcImpl extends ClientDomainSvcImpl implements ServiceProcessor, ClientDomainAdminSvc {
 
-	@Autowired ClientDomainAdminDao clientDomainAdminDao;
-	@Autowired AppCachePage appCachePage;
-	@Autowired UtilSvc utilSvc;
+	@Autowired 
+	ClientDomainAdminDao clientDomainAdminDao;
+	
+	@Autowired 
+	AppCachePageUtil appCachePageUtil;
 	
 	@Override
 	public void process(RestRequest request, RestResponse response) {
@@ -43,7 +45,7 @@ public class ClientDomainAdminSvcImpl extends ClientDomainSvcImpl implements Ser
 		switch (action) {
 		case "INIT":
 			request.addParam("appPageParamLoc", "response");
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -53,7 +55,7 @@ public class ClientDomainAdminSvcImpl extends ClientDomainSvcImpl implements Ser
 			break;
 		case "LIST":
 			request.addParam("appPageParamLoc", "response");
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -68,7 +70,7 @@ public class ClientDomainAdminSvcImpl extends ClientDomainSvcImpl implements Ser
 			this.delete(request, response);
 			break;
 		case "SAVE":
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			this.save(request, response);
 			break;
 		default:

@@ -31,7 +31,6 @@ import org.toasthub.core.general.model.MenuItem;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.general.service.MenuSvcImpl;
-import org.toasthub.core.general.service.UtilSvc;
 
 @Service("MenuAdminSvc")
 public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, MenuAdminSvc {
@@ -43,9 +42,6 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 	@Autowired 
 	AppCacheMenu appCacheMenu;
 	
-	@Autowired 
-	UtilSvc utilSvc;
-	
 	// Processor
 	@Override
 	public void process(RestRequest request, RestResponse response) {
@@ -55,7 +51,7 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 		switch (action) {
 		case "INIT": 
 			request.addParam("appPageParamLoc", "response");
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			//appCachePage.getGlobalInfo(request,response);
 			
 			this.initParams(request);
@@ -70,7 +66,7 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 			break;
 		case "LIST":
 			request.addParam("appPageParamLoc", "response");
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			
 			this.initParams(request);
 			this.itemColumns(request, response);
@@ -109,7 +105,7 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 			this.delete(request, response);
 			break;
 		case "SAVE":
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			this.save(request, response);
 			break;
 		default:

@@ -33,7 +33,7 @@ import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.general.service.EntityManagerMainSvc;
 import org.toasthub.core.general.service.UtilSvc;
-import org.toasthub.core.preference.model.AppCachePage;
+import org.toasthub.core.preference.model.AppCachePageUtil;
 import org.toasthub.security.model.User;
 import org.toasthub.security.model.UserContext;
 
@@ -56,7 +56,7 @@ public class AdminSvcImpl implements ServiceProcessor, AdminSvc {
 	MenuAdminSvc menuAdminSvc;
 	
 	@Autowired
-	AppCachePage appCachePage;
+	AppCachePageUtil appCachePageUtil;
 	
 	@Autowired 
 	UserContext userContext;
@@ -69,7 +69,7 @@ public class AdminSvcImpl implements ServiceProcessor, AdminSvc {
 		String action = (String) request.getParams().get(BaseEntity.ACTION);
 		
 		this.setupDefaults(request);
-		appCachePage.getPageInfo(request,response);
+		appCachePageUtil.getPageInfo(request,response);
 		switch (action) {
 		case "INIT": 
 			this.init(request, response);

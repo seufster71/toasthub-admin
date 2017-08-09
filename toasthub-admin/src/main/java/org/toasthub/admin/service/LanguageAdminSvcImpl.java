@@ -27,7 +27,7 @@ import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.general.service.LanguageSvcImpl;
 import org.toasthub.core.general.service.UtilSvc;
-import org.toasthub.core.preference.model.AppCachePage;
+import org.toasthub.core.preference.model.AppCachePageUtil;
 
 @Service("LanguageAdminSvc")
 public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProcessor, LanguageAdminSvc {
@@ -37,7 +37,7 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 	LanguageAdminDao languageAdminDao;
 	
 	@Autowired 
-	AppCachePage appCachePage;
+	AppCachePageUtil appCachePageUtil;
 	
 	@Autowired 
 	UtilSvc utilSvc;
@@ -49,8 +49,8 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 		Long count = 0l;
 		switch (action) {
 		case "INIT":
-			request.addParam(AppCachePage.APPPAGEPARAMLOC, AppCachePage.RESPONSE);
-			appCachePage.getPageInfo(request,response);
+			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
+			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -59,8 +59,8 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 			response.addParam(BaseEntity.ITEMNAME, request.getParam(BaseEntity.ITEMNAME));
 			break;
 		case "LIST":
-			request.addParam(AppCachePage.APPPAGEPARAMLOC, AppCachePage.RESPONSE);
-			appCachePage.getPageInfo(request,response);
+			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
+			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -75,7 +75,7 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 			this.delete(request, response);
 			break;
 		case "SAVE":
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			this.save(request, response);
 			break;
 		default:
@@ -89,7 +89,7 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 		try {
 			languageAdminDao.delete(request, response);
 			// reset cache
-			appCachePage.clearLanguageCache();
+			appCachePageUtil.clearLanguageCache();
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Delete Successful", response);
 		} catch (Exception e) {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Delete Failed", response);
@@ -144,7 +144,7 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 			languageAdminDao.save(request, response);
 
 			// reset cache
-			appCachePage.clearLanguageCache();
+			appCachePageUtil.clearLanguageCache();
 			
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Save Successful", response);
 		} catch (Exception e) {

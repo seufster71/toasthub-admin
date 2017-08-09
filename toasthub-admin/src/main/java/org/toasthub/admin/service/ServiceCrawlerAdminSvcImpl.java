@@ -26,7 +26,7 @@ import org.toasthub.core.general.model.ServiceClass;
 import org.toasthub.core.general.model.ServiceCrawler;
 import org.toasthub.core.general.service.ServiceCrawlerSvcImpl;
 import org.toasthub.core.general.service.UtilSvc;
-import org.toasthub.core.preference.model.AppCachePage;
+import org.toasthub.core.preference.model.AppCachePageUtil;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 
@@ -38,13 +38,10 @@ public class ServiceCrawlerAdminSvcImpl extends ServiceCrawlerSvcImpl implements
 	ServiceCrawlerAdminDao serviceCrawlerAdminDao;
 	
 	@Autowired 
-	AppCachePage appCachePage;
+	AppCachePageUtil appCachePageUtil;
 	
 	@Autowired 
 	ServiceCrawler serviceCrawler;
-	
-	@Autowired 
-	UtilSvc utilSvc;
 	
 	@Override
 	public void process(RestRequest request, RestResponse response) {
@@ -55,7 +52,7 @@ public class ServiceCrawlerAdminSvcImpl extends ServiceCrawlerSvcImpl implements
 		case "INIT":
 			this.initParams(request);
 			request.addParam("appPageParamLoc", "response");
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -66,7 +63,7 @@ public class ServiceCrawlerAdminSvcImpl extends ServiceCrawlerSvcImpl implements
 		case "LIST":
 			this.initParams(request);
 			request.addParam("appPageParamLoc", "response");
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -81,7 +78,7 @@ public class ServiceCrawlerAdminSvcImpl extends ServiceCrawlerSvcImpl implements
 			this.delete(request, response);
 			break;
 		case "SAVE":
-			appCachePage.getPageInfo(request,response);
+			appCachePageUtil.getPageInfo(request,response);
 			this.save(request, response);
 			break;
 		default:
