@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.toasthub.admin.repository.MenuAdminDao;
 import org.toasthub.core.general.handler.ServiceProcessor;
-import org.toasthub.core.general.model.AppCacheMenu;
+import org.toasthub.core.general.model.AppCacheMenuUtil;
 import org.toasthub.core.general.model.BaseEntity;
 import org.toasthub.core.general.model.Menu;
 import org.toasthub.core.general.model.MenuItem;
@@ -40,7 +40,7 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 	MenuAdminDao menuAdminDao;
 	
 	@Autowired 
-	AppCacheMenu appCacheMenu;
+	AppCacheMenuUtil appCacheMenuUtil;
 	
 	// Processor
 	@Override
@@ -121,7 +121,7 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 		try {
 			menuAdminDao.delete(request, response);
 			// reset cache
-			appCacheMenu.reloadMenuCache();
+			appCacheMenuUtil.reloadMenuCache();
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Menu Delete Successful", response);
 		//} catch (PrivilegesException pe){
 		//	utilSvc.addStatus(RestResponse.ERROR, RestResponse.SERVERERROR, pe.getMessage(), response);
@@ -174,7 +174,7 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 			menuAdminDao.save(request, response);
 			
 			// reset cache
-			appCacheMenu.reloadMenuCache();
+			appCacheMenuUtil.reloadMenuCache();
 			
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Menu Save Successful", response);
 		//} catch (PrivilegesException pe){

@@ -22,11 +22,9 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.toasthub.core.general.handler.ServiceProcessor;
-import org.toasthub.core.general.model.AppCacheMenu;
+import org.toasthub.core.general.model.AppCacheMenuUtil;
 import org.toasthub.core.general.model.BaseEntity;
 import org.toasthub.core.general.model.MenuItem;
 import org.toasthub.core.general.model.RestRequest;
@@ -34,7 +32,6 @@ import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.general.service.EntityManagerMainSvc;
 import org.toasthub.core.general.service.UtilSvc;
 import org.toasthub.core.preference.model.AppCachePageUtil;
-import org.toasthub.security.model.User;
 import org.toasthub.security.model.UserContext;
 
 @Service("AdminSvc")
@@ -49,7 +46,7 @@ public class AdminSvcImpl implements ServiceProcessor, AdminSvc {
 	EntityManagerMainSvc entityManagerMainSvc;
 	
 	@Autowired 
-	AppCacheMenu appCacheMenu;
+	AppCacheMenuUtil appCacheMenuUtil;
 	
 	@Autowired 
 	@Qualifier("MenuAdminSvc")
@@ -102,7 +99,7 @@ public class AdminSvcImpl implements ServiceProcessor, AdminSvc {
 		
 		ArrayList<String> mylist = (ArrayList<String>) request.getParam(BaseEntity.MENUNAMES);
 		for (String menuName : mylist) {
-			menu = appCacheMenu.getMenu(menuName,(String)request.getParam(BaseEntity.MENUAPIVERSION),(String)request.getParam(BaseEntity.MENUAPPVERSION),(String)request.getParam(BaseEntity.LANG));
+			menu = appCacheMenuUtil.getMenu(menuName,(String)request.getParam(BaseEntity.MENUAPIVERSION),(String)request.getParam(BaseEntity.MENUAPPVERSION),(String)request.getParam(BaseEntity.LANG));
 			menuList.put(menuName, menu);
 		}
 		
