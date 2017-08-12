@@ -18,7 +18,7 @@ package org.toasthub.admin.preference.repository;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.toasthub.core.general.model.BaseEntity;
+import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.preference.model.AppPageName;
@@ -30,14 +30,14 @@ public class AppPageAdminDaoImpl extends AppPageDaoImpl implements AppPageAdminD
 	
 	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
-		AppPageName appPageName = (AppPageName) request.getParam(BaseEntity.ITEM);
+		AppPageName appPageName = (AppPageName) request.getParam(GlobalConstant.ITEM);
 		entityManagerDataSvc.getInstance().merge(appPageName);
 	}
 
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
-		if (request.containsParam(BaseEntity.ITEMID) && !"".equals(request.getParam(BaseEntity.ITEMID))) {
-			AppPageName appPageName = (AppPageName) entityManagerDataSvc.getInstance().getReference(AppPageName.class, new Long((Integer) request.getParam(BaseEntity.ITEMID)));
+		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
+			AppPageName appPageName = (AppPageName) entityManagerDataSvc.getInstance().getReference(AppPageName.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
 			entityManagerDataSvc.getInstance().remove(appPageName);
 		
 		} else {

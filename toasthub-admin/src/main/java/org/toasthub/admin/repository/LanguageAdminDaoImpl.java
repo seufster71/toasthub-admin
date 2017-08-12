@@ -19,7 +19,7 @@ package org.toasthub.admin.repository;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.toasthub.core.general.model.BaseEntity;
+import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.Language;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
@@ -31,15 +31,15 @@ public class LanguageAdminDaoImpl extends LanguageDaoImpl implements LanguageAdm
 	
 	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
-		Language language = (Language) request.getParam(BaseEntity.ITEM);
+		Language language = (Language) request.getParam(GlobalConstant.ITEM);
 		entityManagerDataSvc.getInstance().merge(language);
 	}
 
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
-		if (request.containsParam(BaseEntity.ITEMID) && !"".equals(request.getParam(BaseEntity.ITEMID))) {
+		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
 			
-			Language language = (Language) entityManagerDataSvc.getInstance().getReference(Language.class,  new Long((Integer) request.getParam(BaseEntity.ITEMID)));
+			Language language = (Language) entityManagerDataSvc.getInstance().getReference(Language.class,  new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
 			entityManagerDataSvc.getInstance().remove(language);
 			
 		} else {

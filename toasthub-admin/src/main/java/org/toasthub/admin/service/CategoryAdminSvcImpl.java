@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.toasthub.admin.repository.CategoryAdminDao;
 import org.toasthub.core.general.handler.ServiceProcessor;
-import org.toasthub.core.general.model.BaseEntity;
+import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.general.service.CategorySvcImpl;
@@ -39,7 +39,7 @@ public class CategoryAdminSvcImpl extends CategorySvcImpl implements ServiceProc
 	
 	@Override
 	public void process(RestRequest request, RestResponse response) {
-		String action = (String) request.getParams().get(BaseEntity.ACTION);
+		String action = (String) request.getParams().get(GlobalConstant.ACTION);
 		
 		Long count = 0l;
 		switch (action) {

@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.toasthub.admin.repository.ServiceCrawlerAdminDao;
 import org.toasthub.core.general.handler.ServiceProcessor;
-import org.toasthub.core.general.model.BaseEntity;
+import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.ServiceClass;
 import org.toasthub.core.general.model.AppCacheServiceCrawler;
 import org.toasthub.core.general.service.ServiceCrawlerSvcImpl;
@@ -44,7 +44,7 @@ public class ServiceCrawlerAdminSvcImpl extends ServiceCrawlerSvcImpl implements
 	
 	@Override
 	public void process(RestRequest request, RestResponse response) {
-		String action = (String) request.getParams().get(BaseEntity.ACTION);
+		String action = (String) request.getParams().get(GlobalConstant.ACTION);
 		
 		Long count = 0l;
 		switch (action) {
@@ -53,22 +53,22 @@ public class ServiceCrawlerAdminSvcImpl extends ServiceCrawlerSvcImpl implements
 			request.addParam("appPageParamLoc", "response");
 			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
-			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
+			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
 				this.items(request, response);
 			}
-			response.addParam(BaseEntity.ITEMNAME, request.getParam(BaseEntity.ITEMNAME));
+			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
 		case "LIST":
 			this.initParams(request);
 			request.addParam("appPageParamLoc", "response");
 			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
-			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
+			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
 				this.items(request, response);
 			}
-			response.addParam(BaseEntity.ITEMNAME, request.getParam(BaseEntity.ITEMNAME));
+			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
 		case "SHOW":
 			this.item(request, response);
@@ -104,17 +104,17 @@ public class ServiceCrawlerAdminSvcImpl extends ServiceCrawlerSvcImpl implements
 			// validate
 			utilSvc.validateParams(request, response);
 			
-			if ((Boolean) request.getParam(BaseEntity.VALID) == false) {
+			if ((Boolean) request.getParam(GlobalConstant.VALID) == false) {
 				utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Validation Error", response);
 				return;
 			}
 			// get existing item
-			if (request.containsParam(BaseEntity.ITEMID) && !request.getParam(BaseEntity.ITEMID).equals("")) {
+			if (request.containsParam(GlobalConstant.ITEMID) && !request.getParam(GlobalConstant.ITEMID).equals("")) {
 				serviceCrawlerAdminDao.item(request, response);
-				request.addParam(BaseEntity.ITEM, response.getParam(BaseEntity.ITEM));
-				response.getParams().remove(BaseEntity.ITEM);
+				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
+				response.getParams().remove(GlobalConstant.ITEM);
 			} else {
-				request.addParam(BaseEntity.ITEM, new ServiceClass());
+				request.addParam(GlobalConstant.ITEM, new ServiceClass());
 			}
 			// marshall
 			utilSvc.marshallFields(request, response);

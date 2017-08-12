@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.toasthub.admin.repository.LanguageAdminDao;
 import org.toasthub.core.general.handler.ServiceProcessor;
-import org.toasthub.core.general.model.BaseEntity;
+import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.Language;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
@@ -44,7 +44,7 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 	
 	@Override
 	public void process(RestRequest request, RestResponse response) {
-		String action = (String) request.getParams().get(BaseEntity.ACTION);
+		String action = (String) request.getParams().get(GlobalConstant.ACTION);
 		
 		Long count = 0l;
 		switch (action) {
@@ -52,21 +52,21 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
 			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
-			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
+			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
 				this.items(request, response);
 			}
-			response.addParam(BaseEntity.ITEMNAME, request.getParam(BaseEntity.ITEMNAME));
+			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
 		case "LIST":
 			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
 			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
-			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
+			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
 				this.items(request, response);
 			}
-			response.addParam(BaseEntity.ITEMNAME, request.getParam(BaseEntity.ITEMNAME));
+			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
 		case "SHOW":
 			//this.item(request, response);
@@ -103,22 +103,22 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 			// validate
 			utilSvc.validateParams(request, response);
 			
-			if ((Boolean) request.getParam(BaseEntity.VALID) == false) {
+			if ((Boolean) request.getParam(GlobalConstant.VALID) == false) {
 				utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Validation Error", response);
 				return;
 			}
 			// get existing item
-			if (request.containsParam(BaseEntity.ITEMID) && !request.getParam(BaseEntity.ITEMID).equals("")) {
+			if (request.containsParam(GlobalConstant.ITEMID) && !request.getParam(GlobalConstant.ITEMID).equals("")) {
 				languageAdminDao.item(request, response);
-				request.addParam(BaseEntity.ITEM, response.getParam(BaseEntity.ITEM));
-				response.getParams().remove(BaseEntity.ITEM);
+				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
+				response.getParams().remove(GlobalConstant.ITEM);
 			} else {
-				request.addParam(BaseEntity.ITEM, new Language());
+				request.addParam(GlobalConstant.ITEM, new Language());
 			}
 			// marshall
 			utilSvc.marshallFields(request, response);
 			// check for default - only one item can be default
-			Language language = (Language) request.getParam(BaseEntity.ITEM);
+			Language language = (Language) request.getParam(GlobalConstant.ITEM);
 			
 			if (language.isDefaultLang()){
 				// find old default and set to false
@@ -127,9 +127,9 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 				try {
 					languageAdminDao.getDefault(oldLangRequest, oldLangResponse);
 					// save
-					Language oldDefault = (Language) oldLangResponse.getParam(BaseEntity.ITEM);
+					Language oldDefault = (Language) oldLangResponse.getParam(GlobalConstant.ITEM);
 					oldDefault.setDefaultLang(false);
-					oldLangRequest.addParam(BaseEntity.ITEM, oldDefault);
+					oldLangRequest.addParam(GlobalConstant.ITEM, oldDefault);
 					languageAdminDao.save(oldLangRequest, oldLangResponse);
 				} catch (Exception e) {
 					if (!e.getMessage().contains("No entity found for query")) {

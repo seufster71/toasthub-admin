@@ -18,7 +18,7 @@ package org.toasthub.admin.repository;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.toasthub.core.general.model.BaseEntity;
+import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.ServiceClass;
 import org.toasthub.core.general.repository.ServiceCrawlerDaoImpl;
 import org.toasthub.core.general.model.RestRequest;
@@ -30,14 +30,14 @@ public class ServiceCrawlerAdminDaoImpl extends ServiceCrawlerDaoImpl implements
 	
 	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
-		ServiceClass serviceClass = (ServiceClass) request.getParam(BaseEntity.ITEM);
+		ServiceClass serviceClass = (ServiceClass) request.getParam(GlobalConstant.ITEM);
 		entityManagerDataSvc.getInstance().merge(serviceClass);
 	}
 
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
-		if (request.containsParam(BaseEntity.ITEMID) && !"".equals(request.getParam(BaseEntity.ITEMID))) {
-			ServiceClass serviceClass = (ServiceClass) entityManagerDataSvc.getInstance().getReference(ServiceClass.class, new Long((Integer) request.getParam(BaseEntity.ITEMID)));
+		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
+			ServiceClass serviceClass = (ServiceClass) entityManagerDataSvc.getInstance().getReference(ServiceClass.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
 			entityManagerDataSvc.getInstance().remove(serviceClass);
 				
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Item deleted", response);

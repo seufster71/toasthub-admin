@@ -19,7 +19,7 @@ package org.toasthub.admin.repository;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.toasthub.core.general.model.BaseEntity;
+import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.Menu;
 import org.toasthub.core.general.model.MenuItem;
 import org.toasthub.core.general.model.RestRequest;
@@ -32,36 +32,36 @@ public class MenuAdminDaoImpl extends MenuDaoImpl implements MenuAdminDao {
 	
 	//@Authorize
 	public void save(RestRequest request, RestResponse response) throws Exception {
-		if ("subItem".equals(request.getParam(BaseEntity.ITEMTYPE))) {
+		if ("subItem".equals(request.getParam(GlobalConstant.ITEMTYPE))) {
 			// menu reference
-			MenuItem menuItem = (MenuItem) request.getParam(BaseEntity.ITEM);
+			MenuItem menuItem = (MenuItem) request.getParam(GlobalConstant.ITEM);
 			if (menuItem.getMenu() == null) {
-				Menu menu = (Menu) entityManagerDataSvc.getInstance().getReference(Menu.class, new Long((Integer) request.getParam(BaseEntity.PARENTID)));
+				Menu menu = (Menu) entityManagerDataSvc.getInstance().getReference(Menu.class, new Long((Integer) request.getParam(GlobalConstant.PARENTID)));
 				menuItem.setMenu(menu);
 			}
 			entityManagerDataSvc.getInstance().merge(menuItem);
-		} else if ("subSub".equals(request.getParam(BaseEntity.ITEMTYPE))) {
-			MenuItem menuItem = (MenuItem) request.getParam(BaseEntity.ITEM);
+		} else if ("subSub".equals(request.getParam(GlobalConstant.ITEMTYPE))) {
+			MenuItem menuItem = (MenuItem) request.getParam(GlobalConstant.ITEM);
 			if (menuItem.getParent() == null) {
-				MenuItem p = (MenuItem) entityManagerDataSvc.getInstance().getReference(MenuItem.class, new Long((Integer) request.getParam(BaseEntity.PARENTID)));
+				MenuItem p = (MenuItem) entityManagerDataSvc.getInstance().getReference(MenuItem.class, new Long((Integer) request.getParam(GlobalConstant.PARENTID)));
 				menuItem.setParent(p);
 				menuItem.setMenu(p.getMenu());
 			}
 			entityManagerDataSvc.getInstance().merge(menuItem);
 		} else {
-			Menu menu = (Menu) request.getParam(BaseEntity.ITEM);
+			Menu menu = (Menu) request.getParam(GlobalConstant.ITEM);
 			entityManagerDataSvc.getInstance().merge(menu);
 		}
 	}
 
 	//@Authorize
 	public void delete(RestRequest request, RestResponse response) throws Exception {
-		if (request.containsParam(BaseEntity.ITEMID) && !"".equals(request.getParam(BaseEntity.ITEMID))) {
-			if (request.containsParam(BaseEntity.ITEMTYPE) && "subItem".equals(request.getParam(BaseEntity.ITEMTYPE)) ) {
-				MenuItem menuItem = (MenuItem) entityManagerDataSvc.getInstance().getReference(MenuItem.class, new Long((Integer) request.getParam(BaseEntity.ITEMID)));
+		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
+			if (request.containsParam(GlobalConstant.ITEMTYPE) && "subItem".equals(request.getParam(GlobalConstant.ITEMTYPE)) ) {
+				MenuItem menuItem = (MenuItem) entityManagerDataSvc.getInstance().getReference(MenuItem.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
 				entityManagerDataSvc.getInstance().remove(menuItem);
 			} else {
-				Menu menu = (Menu) entityManagerDataSvc.getInstance().getReference(Menu.class, new Long((Integer) request.getParam(BaseEntity.ITEMID)));
+				Menu menu = (Menu) entityManagerDataSvc.getInstance().getReference(Menu.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
 				entityManagerDataSvc.getInstance().remove(menu);
 			}
 		} else {

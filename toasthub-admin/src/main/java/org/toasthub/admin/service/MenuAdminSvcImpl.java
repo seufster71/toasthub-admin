@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 import org.toasthub.admin.repository.MenuAdminDao;
 import org.toasthub.core.general.handler.ServiceProcessor;
 import org.toasthub.core.general.model.AppCacheMenuUtil;
-import org.toasthub.core.general.model.BaseEntity;
+import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.Menu;
 import org.toasthub.core.general.model.MenuItem;
 import org.toasthub.core.general.model.RestRequest;
@@ -45,7 +45,7 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 	// Processor
 	@Override
 	public void process(RestRequest request, RestResponse response) {
-		String action = (String) request.getParams().get(BaseEntity.ACTION);
+		String action = (String) request.getParams().get(GlobalConstant.ACTION);
 		
 		Long count = 0l;
 		switch (action) {
@@ -56,9 +56,9 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 			
 			this.initParams(request);
 			this.itemColumns(request, response);
-			request.addParam(BaseEntity.SHOWALL, true);
+			request.addParam(GlobalConstant.SHOWALL, true);
 			this.getMenuCount(request, response);
-			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
+			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
 				this.getMenus(request, response);
 			}
@@ -70,36 +70,36 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 			
 			this.initParams(request);
 			this.itemColumns(request, response);
-			request.addParam(BaseEntity.SHOWALL, true);
+			request.addParam(GlobalConstant.SHOWALL, true);
 			this.getMenuCount(request, response);
-			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
+			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
 				this.getMenus(request, response);
 			}
-			response.addParam(BaseEntity.PARENTID, request.getParam(BaseEntity.PARENTID));
+			response.addParam(GlobalConstant.PARENTID, request.getParam(GlobalConstant.PARENTID));
 			break;
 		case "LIST_MENUITEMS":
 			
 			this.initParams(request);
 		
 			this.getMenuItemCount(request, response);
-			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
+			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
 				this.getMenuItems(request, response);
 			}
-			if (request.containsParam(BaseEntity.PARENTID)){
-				response.addParam(BaseEntity.PARENTID, request.getParam(BaseEntity.PARENTID));
+			if (request.containsParam(GlobalConstant.PARENTID)){
+				response.addParam(GlobalConstant.PARENTID, request.getParam(GlobalConstant.PARENTID));
 			} else {
-				response.addParam(BaseEntity.PARENTID, request.getParam(Menu.ID));
+				response.addParam(GlobalConstant.PARENTID, request.getParam(Menu.ID));
 			}
 			break;
 		case "SHOW":
 			this.getMenu(request, response);
-			if (request.containsParam(BaseEntity.PARENTID)){
-				response.addParam(BaseEntity.PARENTID,(Integer) request.getParam(BaseEntity.PARENTID));
+			if (request.containsParam(GlobalConstant.PARENTID)){
+				response.addParam(GlobalConstant.PARENTID,(Integer) request.getParam(GlobalConstant.PARENTID));
 			}
 			response.addParam(Menu.ID,(Integer) request.getParam(Menu.ID));
-			response.addParam(BaseEntity.ID,request.getParam(BaseEntity.ID));
+			response.addParam(GlobalConstant.ID,request.getParam(GlobalConstant.ID));
 			break;
 		case "DELETE":
 			this.delete(request, response);
@@ -134,8 +134,8 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 	@Override
 	public void save(RestRequest request, RestResponse response) {
 		try {
-			if ( !request.containsParam(BaseEntity.ITEMTYPE) ){
-				request.addParam(BaseEntity.ITEMTYPE, "menu");
+			if ( !request.containsParam(GlobalConstant.ITEMTYPE) ){
+				request.addParam(GlobalConstant.ITEMTYPE, "menu");
 				if (!request.containsParam("appForms")) {
 					request.addParam("appForms", new ArrayList<String>(Arrays.asList("APP_MENU_FORM")));
 				}
@@ -144,27 +144,27 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 			// validate
 			utilSvc.validateParams(request, response);
 			
-			if ((Boolean) request.getParam(BaseEntity.VALID) == false) {
+			if ((Boolean) request.getParam(GlobalConstant.VALID) == false) {
 				utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Validation Error", response);
 				return;
 			}
 			
 			// get existing item
-			if (request.containsParam(BaseEntity.ITEMID) && !request.getParam(BaseEntity.ITEMID).equals("")) {
+			if (request.containsParam(GlobalConstant.ITEMID) && !request.getParam(GlobalConstant.ITEMID).equals("")) {
 				menuAdminDao.item(request, response);
-				request.addParam(BaseEntity.ITEM, response.getParam(BaseEntity.ITEM));
-				response.getParams().remove(BaseEntity.ITEM);
+				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
+				response.getParams().remove(GlobalConstant.ITEM);
 			} else {
-				if ("subItem".equals(request.getParam(BaseEntity.ITEMTYPE)) || "subSub".equals(request.getParam(BaseEntity.ITEMTYPE))){
+				if ("subItem".equals(request.getParam(GlobalConstant.ITEMTYPE)) || "subSub".equals(request.getParam(GlobalConstant.ITEMTYPE))){
 					MenuItem menuItem = new MenuItem();
 					menuItem.setArchive(false);
 					menuItem.setLocked(false);
-					request.addParam(BaseEntity.ITEM, menuItem);
+					request.addParam(GlobalConstant.ITEM, menuItem);
 				} else {
 					Menu menu = new Menu();
 					menu.setArchive(false);
 					menu.setLocked(false);
-					request.addParam(BaseEntity.ITEM, menu);
+					request.addParam(GlobalConstant.ITEM, menu);
 				}
 			}
 			// marshall

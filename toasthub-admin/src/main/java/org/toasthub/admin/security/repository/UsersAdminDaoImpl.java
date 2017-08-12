@@ -20,7 +20,7 @@ import javax.persistence.Query;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.toasthub.core.general.model.BaseEntity;
+import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.security.model.Role;
@@ -34,15 +34,15 @@ public class UsersAdminDaoImpl extends UsersDaoImpl implements UsersAdminDao {
 	
 	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
-		User user = (User) request.getParam(BaseEntity.ITEM);
+		User user = (User) request.getParam(GlobalConstant.ITEM);
 		entityManagerSecuritySvc.getInstance().merge(user);
 	}
 	
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
-		if (request.containsParam(BaseEntity.ITEMID) && !"".equals(request.getParam(BaseEntity.ITEMID))) {
+		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
 			
-			User user = (User) entityManagerSecuritySvc.getInstance().getReference(User.class,  new Long((Integer) request.getParam(BaseEntity.ITEMID)));
+			User user = (User) entityManagerSecuritySvc.getInstance().getReference(User.class,  new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
 			entityManagerSecuritySvc.getInstance().remove(user);
 			
 		} else {
@@ -60,7 +60,7 @@ public class UsersAdminDaoImpl extends UsersDaoImpl implements UsersAdminDao {
 		// get Role
 		Role role = (Role) entityManagerSecuritySvc.getInstance().getReference(Role.class, new Long((Integer) request.getParam("roleId")));
 		// get User
-		User user = (User) entityManagerSecuritySvc.getInstance().getReference(User.class, new Long((Integer) request.getParam(BaseEntity.ITEMID)));
+		User user = (User) entityManagerSecuritySvc.getInstance().getReference(User.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
 		// save
 		entityManagerSecuritySvc.getInstance().merge(new UserRole(user,role));
 		
@@ -71,7 +71,7 @@ public class UsersAdminDaoImpl extends UsersDaoImpl implements UsersAdminDao {
 		String queryStr = "SELECT ur FROM UserRole AS ur WHERE ur.user.id =:uid AND ur.role.id =:rid";
 		Query query = entityManagerSecuritySvc.getInstance().createQuery(queryStr);
 	
-		query.setParameter("uid", new Long((Integer) request.getParam(BaseEntity.ITEMID)));
+		query.setParameter("uid", new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
 		query.setParameter("rid", new Long((Integer) request.getParam("roleId")));
 		UserRole userRole = (UserRole) query.getSingleResult();
 		

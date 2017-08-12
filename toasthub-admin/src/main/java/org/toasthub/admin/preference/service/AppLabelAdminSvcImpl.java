@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.toasthub.admin.preference.repository.AppLabelAdminDao;
 import org.toasthub.core.general.handler.ServiceProcessor;
-import org.toasthub.core.general.model.BaseEntity;
+import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.general.service.UtilSvc;
@@ -44,25 +44,25 @@ public class AppLabelAdminSvcImpl extends AppLabelSvcImpl implements ServiceProc
 	
 	@Override
 	public void process(RestRequest request, RestResponse response) {
-		String action = (String) request.getParams().get(BaseEntity.ACTION);
+		String action = (String) request.getParams().get(GlobalConstant.ACTION);
 		
 		appCachePageUtil.getPageInfo(request,response);
 		Long count = 0l;
 		switch (action) {
 		case "INIT":
 			itemCount(request, response);
-			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
+			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
 				items(request, response);
 			}
 			break;
 		case "LIST":
 			itemCount(request, response);
-			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
+			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
 				items(request, response);
 			}
-			response.addParam(BaseEntity.PARENTID, request.getParam(BaseEntity.PARENTID));
+			response.addParam(GlobalConstant.PARENTID, request.getParam(GlobalConstant.PARENTID));
 			break;
 		case "SHOW":
 			this.item(request, response);
@@ -99,21 +99,21 @@ public class AppLabelAdminSvcImpl extends AppLabelSvcImpl implements ServiceProc
 			// validate
 			utilSvc.validateParams(request, response);
 									
-			if ((Boolean) request.getParam(BaseEntity.VALID) == false) {
+			if ((Boolean) request.getParam(GlobalConstant.VALID) == false) {
 				utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Validation Error", response);
 				return;
 			}
 						
 			// get existing item
-			if (request.containsParam(BaseEntity.ITEMID) && !request.getParam(BaseEntity.ITEMID).equals("")) {
+			if (request.containsParam(GlobalConstant.ITEMID) && !request.getParam(GlobalConstant.ITEMID).equals("")) {
 				appLabelAdminDao.item(request, response);
-				request.addParam(BaseEntity.ITEM, response.getParam(BaseEntity.ITEM));
-				response.getParams().remove(BaseEntity.ITEM);
+				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
+				response.getParams().remove(GlobalConstant.ITEM);
 			} else {
 				AppPageLabelName l = new AppPageLabelName();
 				l.setArchive(false);
 				l.setLocked(false);
-				request.addParam(BaseEntity.ITEM, l);
+				request.addParam(GlobalConstant.ITEM, l);
 			}
 						
 			// marshall

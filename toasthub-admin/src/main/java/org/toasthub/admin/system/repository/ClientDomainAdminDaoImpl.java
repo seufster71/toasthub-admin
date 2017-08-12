@@ -18,7 +18,7 @@ package org.toasthub.admin.system.repository;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.toasthub.core.general.model.BaseEntity;
+import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.system.model.ClientDomain;
@@ -30,15 +30,15 @@ public class ClientDomainAdminDaoImpl extends ClientDomainDaoImpl implements Cli
 
 	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
-		ClientDomain clientDomain = (ClientDomain) request.getParam(BaseEntity.ITEM);
+		ClientDomain clientDomain = (ClientDomain) request.getParam(GlobalConstant.ITEM);
 		entityManagerMainSvc.getEntityMgrMain().merge(clientDomain);
 	}
 	
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
-		if (request.containsParam(BaseEntity.ITEMID) && !"".equals(request.getParam(BaseEntity.ITEMID))) {
+		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
 			
-			ClientDomain clientDomain = (ClientDomain) entityManagerMainSvc.getEntityMgrMain().getReference(ClientDomain.class,  new Long((Integer) request.getParam(BaseEntity.ITEMID)));
+			ClientDomain clientDomain = (ClientDomain) entityManagerMainSvc.getEntityMgrMain().getReference(ClientDomain.class,  new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
 			entityManagerMainSvc.getEntityMgrMain().remove(clientDomain);
 			
 		} else {

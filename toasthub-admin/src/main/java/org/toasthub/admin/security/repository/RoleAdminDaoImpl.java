@@ -20,7 +20,7 @@ import javax.persistence.Query;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.toasthub.core.general.model.BaseEntity;
+import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.security.model.Application;
@@ -36,7 +36,7 @@ public class RoleAdminDaoImpl extends RoleDaoImpl implements RoleAdminDao {
 
 	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
-		Role role = (Role) request.getParam(BaseEntity.ITEM);
+		Role role = (Role) request.getParam(GlobalConstant.ITEM);
 		
 		// get application
 		if (role.getApplication() == null) {
@@ -51,9 +51,9 @@ public class RoleAdminDaoImpl extends RoleDaoImpl implements RoleAdminDao {
 	
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
-		if (request.containsParam(BaseEntity.ITEMID) && !"".equals(request.getParam(BaseEntity.ITEMID))) {
+		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
 			
-			Role role = (Role) entityManagerSecuritySvc.getInstance().getReference(Role.class,  new Long((Integer) request.getParam(BaseEntity.ITEMID)));
+			Role role = (Role) entityManagerSecuritySvc.getInstance().getReference(Role.class,  new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
 			entityManagerSecuritySvc.getInstance().remove(role);
 			
 		} else {
@@ -65,7 +65,7 @@ public class RoleAdminDaoImpl extends RoleDaoImpl implements RoleAdminDao {
 	@Override
 	public void savePermission(RestRequest request, RestResponse response) throws Exception {
 		// get Role
-		Role role = (Role) entityManagerSecuritySvc.getInstance().getReference(Role.class, new Long((Integer) request.getParam(BaseEntity.ITEMID)));
+		Role role = (Role) entityManagerSecuritySvc.getInstance().getReference(Role.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
 		// get Permission
 		Permission permission = (Permission) entityManagerSecuritySvc.getInstance().getReference(Permission.class, new Long((Integer) request.getParam("permissionId")));
 		// save
@@ -80,7 +80,7 @@ public class RoleAdminDaoImpl extends RoleDaoImpl implements RoleAdminDao {
 		String queryStr = "SELECT rp FROM RolePermission AS rp WHERE rp.role.id =:rid AND rp.permission.id =:pid";
 		Query query = entityManagerSecuritySvc.getInstance().createQuery(queryStr);
 	
-		query.setParameter("rid", new Long((Integer) request.getParam(BaseEntity.ITEMID)));
+		query.setParameter("rid", new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
 		query.setParameter("pid", new Long((Integer) request.getParam("permissionId")));
 		RolePermission rolePermission = (RolePermission) query.getSingleResult();
 		

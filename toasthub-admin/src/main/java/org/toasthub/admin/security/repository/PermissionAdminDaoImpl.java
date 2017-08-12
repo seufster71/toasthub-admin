@@ -18,7 +18,7 @@ package org.toasthub.admin.security.repository;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.toasthub.core.general.model.BaseEntity;
+import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.security.model.Application;
@@ -31,7 +31,7 @@ public class PermissionAdminDaoImpl extends PermissionDaoImpl implements Permiss
 
 	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
-		Permission permission = (Permission) request.getParam(BaseEntity.ITEM);
+		Permission permission = (Permission) request.getParam(GlobalConstant.ITEM);
 		// get application
 		if (permission.getApplication() == null){
 			Application application = (Application) entityManagerSecuritySvc.getInstance().getReference(Application.class, permission.getApplicationId());
@@ -42,9 +42,9 @@ public class PermissionAdminDaoImpl extends PermissionDaoImpl implements Permiss
 	
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
-		if (request.containsParam(BaseEntity.ITEMID) && !"".equals(request.getParam(BaseEntity.ITEMID))) {
+		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
 			
-			Permission permission = (Permission) entityManagerSecuritySvc.getInstance().getReference(Permission.class,  new Long((Integer) request.getParam(BaseEntity.ITEMID)));
+			Permission permission = (Permission) entityManagerSecuritySvc.getInstance().getReference(Permission.class,  new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
 			entityManagerSecuritySvc.getInstance().remove(permission);
 			
 		} else {

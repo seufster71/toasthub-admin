@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.toasthub.admin.security.repository.RoleAdminDao;
 import org.toasthub.core.general.handler.ServiceProcessor;
-import org.toasthub.core.general.model.BaseEntity;
+import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.general.service.UtilSvc;
@@ -45,7 +45,7 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 	
 	@Override
 	public void process(RestRequest request, RestResponse response) {
-		String action = (String) request.getParams().get(BaseEntity.ACTION);
+		String action = (String) request.getParams().get(GlobalConstant.ACTION);
 		
 		Long count = 0l;
 		switch (action) {
@@ -53,24 +53,24 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 			request.addParam("appPageParamLoc", "response");
 			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
-			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
+			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
 				this.items(request, response);
 			}
-			response.addParam(BaseEntity.ITEMNAME, request.getParam(BaseEntity.ITEMNAME));
+			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
 		case "LIST":
 			request.addParam("appPageParamLoc", "response");
 			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
-			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
+			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
 				this.items(request, response);
 			}
 			if (request.containsParam("userId")){
 				this.userRoleIds(request, response);
 			}
-			response.addParam(BaseEntity.ITEMNAME, request.getParam(BaseEntity.ITEMNAME));
+			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
 		case "SHOW":
 			this.item(request, response);
@@ -114,21 +114,21 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 			// validate
 			utilSvc.validateParams(request, response);
 			
-			if ((Boolean) request.getParam(BaseEntity.VALID) == false) {
+			if ((Boolean) request.getParam(GlobalConstant.VALID) == false) {
 				utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Validation Error", response);
 				return;
 			}
 			// get existing item
-			if (request.containsParam(BaseEntity.ITEMID) && request.getParam(BaseEntity.ITEMID) != null && !request.getParam(BaseEntity.ITEMID).equals("")) {
+			if (request.containsParam(GlobalConstant.ITEMID) && request.getParam(GlobalConstant.ITEMID) != null && !request.getParam(GlobalConstant.ITEMID).equals("")) {
 				roleAdminDao.item(request, response);
-				request.addParam(BaseEntity.ITEM, response.getParam(BaseEntity.ITEM));
-				response.getParams().remove(BaseEntity.ITEM);
+				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
+				response.getParams().remove(GlobalConstant.ITEM);
 			} else {
 				Role role  = new Role();
 				role.setArchive(false);
 				role.setLocked(false);
 				
-				request.addParam(BaseEntity.ITEM, role);
+				request.addParam(GlobalConstant.ITEM, role);
 			}
 			
 			// marshall
@@ -149,7 +149,7 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 		try {
 			
 			// get existing item
-			if (request.containsParam(BaseEntity.ITEMID) && !request.getParam(BaseEntity.ITEMID).equals("")) {
+			if (request.containsParam(GlobalConstant.ITEMID) && !request.getParam(GlobalConstant.ITEMID).equals("")) {
 				
 				roleAdminDao.savePermission(request, response);
 			}
@@ -168,7 +168,7 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 		try {
 			
 			// get existing item
-			if (request.containsParam(BaseEntity.ITEMID) && !request.getParam(BaseEntity.ITEMID).equals("")) {
+			if (request.containsParam(GlobalConstant.ITEMID) && !request.getParam(GlobalConstant.ITEMID).equals("")) {
 				
 				roleAdminDao.deletePermission(request, response);
 			}

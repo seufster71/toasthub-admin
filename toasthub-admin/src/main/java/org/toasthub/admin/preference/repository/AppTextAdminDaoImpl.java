@@ -19,7 +19,7 @@ package org.toasthub.admin.preference.repository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import org.toasthub.core.general.model.BaseEntity;
+import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.preference.model.AppPageName;
@@ -32,7 +32,7 @@ public class AppTextAdminDaoImpl extends AppTextDaoImpl implements AppTextAdminD
 
 	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
-		AppPageTextName appPageTextName = (AppPageTextName) request.getParam(BaseEntity.ITEM);
+		AppPageTextName appPageTextName = (AppPageTextName) request.getParam(GlobalConstant.ITEM);
 		if (appPageTextName.getPageName() == null) {
 			AppPageName appPageName = (AppPageName) entityManagerDataSvc.getInstance().getReference(AppPageName.class, new Long((Integer) request.getParam("parentId")));
 			appPageTextName.setPageName(appPageName);
@@ -42,8 +42,8 @@ public class AppTextAdminDaoImpl extends AppTextDaoImpl implements AppTextAdminD
 
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
-		if (request.containsParam(BaseEntity.ITEMID) && !"".equals(request.getParam(BaseEntity.ITEMID))) {
-			AppPageTextName appPageTextName = (AppPageTextName) entityManagerDataSvc.getInstance().getReference(AppPageTextName.class, new Long((Integer) request.getParam(BaseEntity.ITEMID)));
+		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
+			AppPageTextName appPageTextName = (AppPageTextName) entityManagerDataSvc.getInstance().getReference(AppPageTextName.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
 			entityManagerDataSvc.getInstance().remove(appPageTextName);
 			
 		} else {

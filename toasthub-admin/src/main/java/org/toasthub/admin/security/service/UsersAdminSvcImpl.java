@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.toasthub.admin.security.repository.UsersAdminDao;
 import org.toasthub.core.general.handler.ServiceProcessor;
-import org.toasthub.core.general.model.BaseEntity;
+import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.service.UtilSvc;
 import org.toasthub.core.preference.model.AppCachePageUtil;
 import org.toasthub.security.model.User;
@@ -44,7 +44,7 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 	AppCachePageUtil appCachePageUtil;
 
 	public void process(RestRequest request, RestResponse response) {
-		String action = (String) request.getParams().get(BaseEntity.ACTION);
+		String action = (String) request.getParams().get(GlobalConstant.ACTION);
 		
 		Long count = 0l;
 		switch (action) {
@@ -53,24 +53,24 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 			request.addParam("appPageParamLoc", "response");
 			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
-			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
+			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			this.itemColumns(request, response);
 			if (count != null && count > 0){
 				this.items(request, response);
 			}
-			response.addParam(BaseEntity.ITEMNAME, request.getParam(BaseEntity.ITEMNAME));
+			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
 		case "LIST":
 			this.initParams(request);
 			request.addParam("appPageParamLoc", "response");
 			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
-			count = (Long) response.getParam(BaseEntity.ITEMCOUNT);
+			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			this.itemColumns(request, response);
 			if (count != null && count > 0){
 				this.items(request, response);
 			}
-			response.addParam(BaseEntity.ITEMNAME, request.getParam(BaseEntity.ITEMNAME));
+			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
 		case "SHOW":
 			this.item(request, response);
@@ -119,10 +119,10 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 	public void delete(RestRequest request, RestResponse response) {
 		try{
 			// prechecks
-			if (request.containsParam(BaseEntity.ITEMID)){
+			if (request.containsParam(GlobalConstant.ITEMID)){
 				this.item(request, response);
 				// prevent deleting of admin unless special code is added
-				User user = (User)response.getParam(BaseEntity.ITEM);
+				User user = (User)response.getParam(GlobalConstant.ITEM);
 				if (user != null && !user.getUsername().equals("cborgadmin")){
 					try {
 						request.addParam("username", user.getUsername());
@@ -132,11 +132,11 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 						e.printStackTrace();
 					}
 				} else {
-					response.addParam(BaseEntity.ITEM, null);
+					response.addParam(GlobalConstant.ITEM, null);
 					utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "This account can not me deleted", response);
 					return;
 				}
-				response.addParam(BaseEntity.ITEM, null);
+				response.addParam(GlobalConstant.ITEM, null);
 				utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Delete Successful", response);
 			} else {
 				utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "You must provide a username!", response);
@@ -154,17 +154,17 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 			// validate
 			utilSvc.validateParams(request, response);
 			
-			if ((Boolean) request.getParam(BaseEntity.VALID) == false) {
+			if ((Boolean) request.getParam(GlobalConstant.VALID) == false) {
 				utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Validation Error", response);
 				return;
 			}
 			// get existing item
-			if (request.containsParam(BaseEntity.ITEMID) && request.getParam(BaseEntity.ITEMID) != null && !request.getParam(BaseEntity.ITEMID).equals("")) {
+			if (request.containsParam(GlobalConstant.ITEMID) && request.getParam(GlobalConstant.ITEMID) != null && !request.getParam(GlobalConstant.ITEMID).equals("")) {
 				usersAdminDao.item(request, response);
-				request.addParam(BaseEntity.ITEM, response.getParam(BaseEntity.ITEM));
-				response.getParams().remove(BaseEntity.ITEM);
+				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
+				response.getParams().remove(GlobalConstant.ITEM);
 			} else {
-				request.addParam(BaseEntity.ITEM, new User());
+				request.addParam(GlobalConstant.ITEM, new User());
 			}
 			// marshall
 			utilSvc.marshallFields(request, response);
@@ -189,7 +189,7 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 		try {
 			
 			// get existing item
-			if (request.containsParam(BaseEntity.ITEMID) && !request.getParam(BaseEntity.ITEMID).equals("")) {
+			if (request.containsParam(GlobalConstant.ITEMID) && !request.getParam(GlobalConstant.ITEMID).equals("")) {
 				
 				usersAdminDao.saveRole(request, response);
 			}
@@ -208,7 +208,7 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 		try {
 			
 			// get existing item
-			if (request.containsParam(BaseEntity.ITEMID) && !request.getParam(BaseEntity.ITEMID).equals("")) {
+			if (request.containsParam(GlobalConstant.ITEMID) && !request.getParam(GlobalConstant.ITEMID).equals("")) {
 				
 				usersAdminDao.deleteRole(request, response);
 			}

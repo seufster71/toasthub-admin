@@ -18,7 +18,7 @@ package org.toasthub.admin.preference.repository;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.toasthub.core.general.model.BaseEntity;
+import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.preference.model.AppPageFormFieldName;
@@ -32,7 +32,7 @@ public class AppFormFieldAdminDaoImpl extends AppFormFieldDaoImpl implements App
 
 	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
-		AppPageFormFieldName appPageFormFieldName = (AppPageFormFieldName) request.getParam(BaseEntity.ITEM);
+		AppPageFormFieldName appPageFormFieldName = (AppPageFormFieldName) request.getParam(GlobalConstant.ITEM);
 		if (appPageFormFieldName.getPageName() == null) {
 			AppPageName appPageName = (AppPageName) entityManagerDataSvc.getInstance().getReference(AppPageName.class, new Long((Integer) request.getParam("parentId")));
 			appPageFormFieldName.setPageName(appPageName);
@@ -42,8 +42,8 @@ public class AppFormFieldAdminDaoImpl extends AppFormFieldDaoImpl implements App
 
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
-		if (request.containsParam(BaseEntity.ITEMID) && !"".equals(request.getParam(BaseEntity.ITEMID))) {
-			AppPageFormFieldName appPageFormFieldName = (AppPageFormFieldName) entityManagerDataSvc.getInstance().getReference(AppPageFormFieldName.class, new Long((Integer) request.getParam(BaseEntity.ITEMID)));
+		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
+			AppPageFormFieldName appPageFormFieldName = (AppPageFormFieldName) entityManagerDataSvc.getInstance().getReference(AppPageFormFieldName.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
 			entityManagerDataSvc.getInstance().remove(appPageFormFieldName);
 			
 		} else {
