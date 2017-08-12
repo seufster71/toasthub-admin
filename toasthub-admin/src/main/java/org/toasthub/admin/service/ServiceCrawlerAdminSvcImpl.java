@@ -23,9 +23,8 @@ import org.toasthub.admin.repository.ServiceCrawlerAdminDao;
 import org.toasthub.core.general.handler.ServiceProcessor;
 import org.toasthub.core.general.model.BaseEntity;
 import org.toasthub.core.general.model.ServiceClass;
-import org.toasthub.core.general.model.ServiceCrawler;
+import org.toasthub.core.general.model.AppCacheServiceCrawler;
 import org.toasthub.core.general.service.ServiceCrawlerSvcImpl;
-import org.toasthub.core.general.service.UtilSvc;
 import org.toasthub.core.preference.model.AppCachePageUtil;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
@@ -41,7 +40,7 @@ public class ServiceCrawlerAdminSvcImpl extends ServiceCrawlerSvcImpl implements
 	AppCachePageUtil appCachePageUtil;
 	
 	@Autowired 
-	ServiceCrawler serviceCrawler;
+	AppCacheServiceCrawler serviceCrawler;
 	
 	@Override
 	public void process(RestRequest request, RestResponse response) {
@@ -92,7 +91,7 @@ public class ServiceCrawlerAdminSvcImpl extends ServiceCrawlerSvcImpl implements
 		try {
 			serviceCrawlerAdminDao.delete(request, response);
 			// reset cache
-			serviceCrawler.clearCache();
+			serviceCrawler.reloadServiceCache();
 		} catch (Exception e) {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Delete Failed", response);
 			e.printStackTrace();
@@ -124,7 +123,7 @@ public class ServiceCrawlerAdminSvcImpl extends ServiceCrawlerSvcImpl implements
 			serviceCrawlerAdminDao.save(request, response);
 
 			// reset cache
-			serviceCrawler.clearCache();
+			serviceCrawler.reloadServiceCache();
 			
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Save Successful", response);
 		} catch (Exception e) {

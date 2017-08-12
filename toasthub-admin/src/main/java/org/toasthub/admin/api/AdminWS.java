@@ -24,8 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.toasthub.core.general.api.View;
 import org.toasthub.core.general.handler.ServiceProcessor;
 import org.toasthub.core.general.model.BaseEntity;
-import org.toasthub.core.general.model.ServiceCrawler;
-import org.toasthub.core.general.service.EntityManagerMainSvc;
+import org.toasthub.core.general.model.AppCacheServiceCrawler;
 import org.toasthub.core.general.service.UtilSvc;
 
 import com.fasterxml.jackson.annotation.JsonView;
@@ -37,9 +36,11 @@ import org.toasthub.core.general.model.RestResponse;
 @RequestMapping("/api/admin")
 public class AdminWS {
 
-	@Autowired EntityManagerMainSvc entityManagerMainSvc;
-	@Autowired UtilSvc utilSvc;
-	@Autowired ServiceCrawler serviceLocator;
+	@Autowired 
+	UtilSvc utilSvc;
+	
+	@Autowired 
+	AppCacheServiceCrawler serviceLocator;
 	
 	@JsonView(View.Admin.class)
 	@RequestMapping(value = "callService", method = RequestMethod.POST)
@@ -49,18 +50,15 @@ public class AdminWS {
 		// set defaults
 		utilSvc.setupDefaults(request);
 		// validate request
-		
-		response.addParam(BaseEntity.APPNAME,entityManagerMainSvc.getAppName());
 
 		// call service locator
-		ServiceProcessor x = serviceLocator.getService("ADMIN",(String) request.getParams().get(BaseEntity.SERVICE),
-				(String) request.getParam(BaseEntity.SVCAPIVERSION), (String) request.getParam(BaseEntity.SVCAPPVERSION),
-				entityManagerMainSvc.getAppDomain());
+		ServiceProcessor x = serviceLocator.getServiceProcessor("ADMIN",(String) request.getParams().get(BaseEntity.SERVICE),
+				(String) request.getParam(BaseEntity.SVCAPIVERSION), (String) request.getParam(BaseEntity.SVCAPPVERSION));
 		// process 
 		if (x != null) {
 			x.process(request, response);
 		} else {
-		
+			utilSvc.addStatus(RestResponse.ERROR, RestResponse.EXECUTIONFAILED, "Service is not available", response);
 		}
 		// response
 		response.addParam(BaseEntity.PAGESTART, request.getParam(BaseEntity.PAGESTART));
