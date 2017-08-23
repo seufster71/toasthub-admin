@@ -26,7 +26,7 @@ import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.security.model.Role;
 import org.toasthub.security.model.User;
 import org.toasthub.security.model.UserRole;
-import org.toasthub.security.repository.UsersDaoImpl;
+import org.toasthub.security.users.UsersDaoImpl;
 
 @Repository("UsersAdminDao")
 @Transactional("TransactionManagerSecurity")

@@ -27,7 +27,7 @@ import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.preference.model.AppCachePageUtil;
 import org.toasthub.security.model.Permission;
-import org.toasthub.security.service.PermissionSvcImpl;
+import org.toasthub.security.permission.PermissionSvcImpl;
 
 @Service("PermissionAdminSvc")
 public class PermissionAdminSvcImpl extends PermissionSvcImpl implements ServiceProcessor, PermissionAdminSvc {

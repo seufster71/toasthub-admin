@@ -2,7 +2,7 @@ package org.toasthub.admin.users;
 
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.security.repository.UsersDao;
+import org.toasthub.security.users.UsersDao;
 
 public interface UsersAdminDao extends UsersDao {
 

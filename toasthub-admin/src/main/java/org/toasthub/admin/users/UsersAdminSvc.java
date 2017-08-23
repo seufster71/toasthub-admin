@@ -2,7 +2,7 @@ package org.toasthub.admin.users;
 
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.security.service.UsersSvc;
+import org.toasthub.security.users.UsersSvc;
 
 public interface UsersAdminSvc extends UsersSvc {
 

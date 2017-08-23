@@ -27,7 +27,7 @@ import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.preference.model.AppCachePageUtil;
 import org.toasthub.security.model.Role;
-import org.toasthub.security.service.RoleSvcImpl;
+import org.toasthub.security.role.RoleSvcImpl;
 
 @Service("RoleAdminSvc")
 public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, RoleAdminSvc {

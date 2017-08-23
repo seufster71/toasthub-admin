@@ -18,7 +18,7 @@ package org.toasthub.admin.permission;
 
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.security.repository.PermissionDao;
+import org.toasthub.security.permission.PermissionDao;
 
 public interface PermissionAdminDao extends PermissionDao {
 

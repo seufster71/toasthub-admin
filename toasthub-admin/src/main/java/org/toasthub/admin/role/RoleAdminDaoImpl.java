@@ -27,7 +27,7 @@ import org.toasthub.security.model.Application;
 import org.toasthub.security.model.Permission;
 import org.toasthub.security.model.Role;
 import org.toasthub.security.model.RolePermission;
-import org.toasthub.security.repository.RoleDaoImpl;
+import org.toasthub.security.role.RoleDaoImpl;
 
 @Repository("RoleAdminDao")
 @Transactional("TransactionManagerSecurity")

@@ -18,7 +18,7 @@ package org.toasthub.admin.role;
 
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.security.service.RoleSvc;
+import org.toasthub.security.role.RoleSvc;
 
 public interface RoleAdminSvc extends RoleSvc {
 

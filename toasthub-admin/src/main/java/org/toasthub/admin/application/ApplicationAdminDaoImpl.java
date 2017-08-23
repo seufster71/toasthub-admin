@@ -21,8 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
+import org.toasthub.security.application.ApplicationDaoImpl;
 import org.toasthub.security.model.Application;
-import org.toasthub.security.repository.ApplicationDaoImpl;
 
 @Repository("ApplicationAdminDao")
 @Transactional("TransactionManagerSecurity")

@@ -18,7 +18,7 @@ package org.toasthub.admin.role;
 
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.security.repository.RoleDao;
+import org.toasthub.security.role.RoleDao;
 
 public interface RoleAdminDao extends RoleDao {
 

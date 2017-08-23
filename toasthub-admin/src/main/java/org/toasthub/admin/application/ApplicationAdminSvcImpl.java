@@ -25,8 +25,8 @@ import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.preference.model.AppCachePageUtil;
+import org.toasthub.security.application.ApplicationSvcImpl;
 import org.toasthub.security.model.Application;
-import org.toasthub.security.service.ApplicationSvcImpl;
 
 @Service("ApplicationAdminSvc")
 public class ApplicationAdminSvcImpl extends ApplicationSvcImpl implements ServiceProcessor, ApplicationAdminSvc {

@@ -24,7 +24,7 @@ import org.toasthub.core.general.handler.ServiceProcessor;
 import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.preference.model.AppCachePageUtil;
 import org.toasthub.security.model.User;
-import org.toasthub.security.service.UsersSvcImpl;
+import org.toasthub.security.users.UsersSvcImpl;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 

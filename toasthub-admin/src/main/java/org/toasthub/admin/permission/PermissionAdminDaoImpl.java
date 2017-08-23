@@ -23,7 +23,7 @@ import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.security.model.Application;
 import org.toasthub.security.model.Permission;
-import org.toasthub.security.repository.PermissionDaoImpl;
+import org.toasthub.security.permission.PermissionDaoImpl;
 
 @Repository("PermissionAdminDao")
 @Transactional("TransactionManagerSecurity")

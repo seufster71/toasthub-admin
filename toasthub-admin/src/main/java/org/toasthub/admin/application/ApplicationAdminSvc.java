@@ -18,7 +18,7 @@ package org.toasthub.admin.application;
 
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.security.service.ApplicationSvc;
+import org.toasthub.security.application.ApplicationSvc;
 
 
 public interface ApplicationAdminSvc extends ApplicationSvc {
