@@ -14,33 +14,33 @@
  * limitations under the License.
  */
 
-package org.toasthub.admin.repository;
+package org.toasthub.admin.application;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.toasthub.core.general.model.GlobalConstant;
-import org.toasthub.core.general.model.ServiceClass;
-import org.toasthub.core.serviceCrawler.ServiceCrawlerDaoImpl;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
+import org.toasthub.security.model.Application;
+import org.toasthub.security.repository.ApplicationDaoImpl;
 
-@Repository("ServiceCrawlerAdminDao")
-@Transactional("TransactionManagerData")
-public class ServiceCrawlerAdminDaoImpl extends ServiceCrawlerDaoImpl implements ServiceCrawlerAdminDao {
-	
+@Repository("ApplicationAdminDao")
+@Transactional("TransactionManagerSecurity")
+public class ApplicationAdminDaoImpl extends ApplicationDaoImpl implements ApplicationAdminDao {
+
 	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
-		ServiceClass serviceClass = (ServiceClass) request.getParam(GlobalConstant.ITEM);
-		entityManagerDataSvc.getInstance().merge(serviceClass);
+		Application application = (Application) request.getParam(GlobalConstant.ITEM);
+		entityManagerSecuritySvc.getInstance().merge(application);
 	}
-
+	
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
-			ServiceClass serviceClass = (ServiceClass) entityManagerDataSvc.getInstance().getReference(ServiceClass.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
-			entityManagerDataSvc.getInstance().remove(serviceClass);
-				
-			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Item deleted", response);
+			
+			Application application = (Application) entityManagerSecuritySvc.getInstance().getReference(Application.class,  new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			entityManagerSecuritySvc.getInstance().remove(application);
+			
 		} else {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);
 		}

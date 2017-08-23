@@ -19,10 +19,10 @@ package org.toasthub.admin.repository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.toasthub.core.general.model.GlobalConstant;
+import org.toasthub.core.category.CategoryDaoImpl;
 import org.toasthub.core.general.model.Category;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.general.repository.CategoryDaoImpl;
 
 @Repository("CategoryAdminDao")
 @Transactional("TransactionManagerData")

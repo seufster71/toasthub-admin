@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package org.toasthub.admin.repository;
+package org.toasthub.admin.role;
 
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.menu.MenuDao;
+import org.toasthub.security.service.RoleSvc;
 
-public interface MenuAdminDao extends MenuDao {
+public interface RoleAdminSvc extends RoleSvc {
 
-	public void save(RestRequest request, RestResponse response) throws Exception;
-	public void delete(RestRequest request, RestResponse response) throws Exception;
+	void delete(RestRequest request, RestResponse response);
+	void save(RestRequest request, RestResponse response);
+	void savePermission(RestRequest request, RestResponse response);
+	void deletePermission(RestRequest request, RestResponse response);
+	void userRoleIds(RestRequest request, RestResponse response);
 }

@@ -16,9 +16,9 @@
 
 package org.toasthub.admin.repository;
 
-import org.toasthub.core.general.repository.ServiceCrawlerDao;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
+import org.toasthub.core.serviceCrawler.ServiceCrawlerDao;
 
 public interface ServiceCrawlerAdminDao extends ServiceCrawlerDao {
 

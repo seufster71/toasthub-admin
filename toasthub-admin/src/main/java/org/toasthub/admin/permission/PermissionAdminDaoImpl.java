@@ -14,37 +14,42 @@
  * limitations under the License.
  */
 
-package org.toasthub.admin.repository;
+package org.toasthub.admin.permission;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.toasthub.core.general.model.GlobalConstant;
-import org.toasthub.core.general.model.ServiceClass;
-import org.toasthub.core.serviceCrawler.ServiceCrawlerDaoImpl;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
+import org.toasthub.security.model.Application;
+import org.toasthub.security.model.Permission;
+import org.toasthub.security.repository.PermissionDaoImpl;
 
-@Repository("ServiceCrawlerAdminDao")
-@Transactional("TransactionManagerData")
-public class ServiceCrawlerAdminDaoImpl extends ServiceCrawlerDaoImpl implements ServiceCrawlerAdminDao {
-	
+@Repository("PermissionAdminDao")
+@Transactional("TransactionManagerSecurity")
+public class PermissionAdminDaoImpl extends PermissionDaoImpl implements PermissionAdminDao {
+
 	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
-		ServiceClass serviceClass = (ServiceClass) request.getParam(GlobalConstant.ITEM);
-		entityManagerDataSvc.getInstance().merge(serviceClass);
+		Permission permission = (Permission) request.getParam(GlobalConstant.ITEM);
+		// get application
+		if (permission.getApplication() == null){
+			Application application = (Application) entityManagerSecuritySvc.getInstance().getReference(Application.class, permission.getApplicationId());
+			permission.setApplication(application);
+		}
+		entityManagerSecuritySvc.getInstance().merge(permission);
 	}
-
+	
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
-			ServiceClass serviceClass = (ServiceClass) entityManagerDataSvc.getInstance().getReference(ServiceClass.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
-			entityManagerDataSvc.getInstance().remove(serviceClass);
-				
-			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Item deleted", response);
+			
+			Permission permission = (Permission) entityManagerSecuritySvc.getInstance().getReference(Permission.class,  new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			entityManagerSecuritySvc.getInstance().remove(permission);
+			
 		} else {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);
 		}
 		
 	}
-
 }

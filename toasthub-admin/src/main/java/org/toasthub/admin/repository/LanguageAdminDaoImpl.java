@@ -23,7 +23,7 @@ import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.Language;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.general.repository.LanguageDaoImpl;
+import org.toasthub.core.language.LanguageDaoImpl;
 
 @Repository("LanguageAdminDao")
 @Transactional("TransactionManagerData")

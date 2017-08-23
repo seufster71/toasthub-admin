@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package org.toasthub.admin.repository;
+package org.toasthub.admin.category;
 
+import org.toasthub.core.category.CategorySvc;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.menu.MenuDao;
 
-public interface MenuAdminDao extends MenuDao {
+public interface CategoryAdminSvc extends CategorySvc {
 
-	public void save(RestRequest request, RestResponse response) throws Exception;
-	public void delete(RestRequest request, RestResponse response) throws Exception;
+	public void delete(RestRequest request, RestResponse response);
+	public void save(RestRequest request, RestResponse response);
+	
 }

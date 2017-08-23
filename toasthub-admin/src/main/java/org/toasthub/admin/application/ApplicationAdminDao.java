@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.toasthub.admin.repository;
+package org.toasthub.admin.application;
 
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.menu.MenuDao;
+import org.toasthub.security.repository.ApplicationDao;
 
-public interface MenuAdminDao extends MenuDao {
+public interface ApplicationAdminDao extends ApplicationDao {
 
 	public void save(RestRequest request, RestResponse response) throws Exception;
 	public void delete(RestRequest request, RestResponse response) throws Exception;

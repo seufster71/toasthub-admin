@@ -16,9 +16,9 @@
 
 package org.toasthub.admin.repository;
 
-import org.toasthub.core.general.repository.LanguageDao;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
+import org.toasthub.core.language.LanguageDao;
 
 public interface LanguageAdminDao extends LanguageDao {
 

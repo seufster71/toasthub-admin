@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.toasthub.admin.repository;
+package org.toasthub.admin.menu;
 
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.menu.MenuDao;
+import org.toasthub.core.menu.MenuSvc;
 
-public interface MenuAdminDao extends MenuDao {
+public interface MenuAdminSvc extends MenuSvc {
 
-	public void save(RestRequest request, RestResponse response) throws Exception;
-	public void delete(RestRequest request, RestResponse response) throws Exception;
+	public void delete(RestRequest request, RestResponse response);
+	public void save(RestRequest request, RestResponse response);
 }

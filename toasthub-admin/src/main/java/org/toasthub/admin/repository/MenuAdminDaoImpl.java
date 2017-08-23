@@ -24,7 +24,7 @@ import org.toasthub.core.general.model.Menu;
 import org.toasthub.core.general.model.MenuItem;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.general.repository.MenuDaoImpl;
+import org.toasthub.core.menu.MenuDaoImpl;
 
 @Repository("MenuAdminDao")
 @Transactional("TransactionManagerData")

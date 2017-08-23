@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package org.toasthub.admin.preference.service;
+package org.toasthub.admin.permission;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.toasthub.admin.preference.repository.AppTextAdminDao;
 import org.toasthub.core.common.UtilSvc;
 import org.toasthub.core.general.handler.ServiceProcessor;
 import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.preference.model.AppCachePageUtil;
-import org.toasthub.core.preference.model.AppPageTextName;
-import org.toasthub.core.preference.service.AppTextSvcImpl;
+import org.toasthub.security.model.Permission;
+import org.toasthub.security.service.PermissionSvcImpl;
 
-@Service("AppTextAdminSvc")
-public class AppTextAdminSvcImpl extends AppTextSvcImpl implements ServiceProcessor, AppTextAdminSvc {
+@Service("PermissionAdminSvc")
+public class PermissionAdminSvcImpl extends PermissionSvcImpl implements ServiceProcessor, PermissionAdminSvc {
 
 	@Autowired 
-	@Qualifier("AppTextAdminDao")
-	AppTextAdminDao appTextAdminDao;
+	@Qualifier("PermissionAdminDao")
+	PermissionAdminDao permissionAdminDao;
 	
 	@Autowired 
 	AppCachePageUtil appCachePageUtil;
@@ -46,23 +46,30 @@ public class AppTextAdminSvcImpl extends AppTextSvcImpl implements ServiceProces
 	public void process(RestRequest request, RestResponse response) {
 		String action = (String) request.getParams().get(GlobalConstant.ACTION);
 		
-		appCachePageUtil.getPageInfo(request,response);
 		Long count = 0l;
 		switch (action) {
 		case "INIT":
-			itemCount(request, response);
+			request.addParam("appPageParamLoc", "response");
+			appCachePageUtil.getPageInfo(request,response);
+			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
 				items(request, response);
 			}
+			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
 		case "LIST":
-			itemCount(request, response);
+			request.addParam("appPageParamLoc", "response");
+			appCachePageUtil.getPageInfo(request,response);
+			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
-				items(request, response);
+				this.items(request, response);
 			}
-			response.addParam(GlobalConstant.PARENTID, request.getParam(GlobalConstant.PARENTID));
+			if (request.containsParam("roleId")){
+				this.rolePermissionIds(request,response);
+			}
+			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
 		case "SHOW":
 			this.item(request, response);
@@ -71,61 +78,71 @@ public class AppTextAdminSvcImpl extends AppTextSvcImpl implements ServiceProces
 			this.delete(request, response);
 			break;
 		case "SAVE":
+			appCachePageUtil.getPageInfo(request,response);
 			this.save(request, response);
 			break;
 		default:
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.ACTIONNOTEXIST, "Action not available", response);
 			break;
 		}
+		
 	}
+
 	
 	//@Authorize
 	public void delete(RestRequest request, RestResponse response) {
 		try {
-			appTextAdminDao.delete(request, response);
-			// reset
-			appCachePageUtil.clearAppPageTextCache();
-			
+			permissionAdminDao.delete(request, response);
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Delete Successful", response);
 		} catch (Exception e) {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Delete Failed", response);
 			e.printStackTrace();
 		}
-	}
+	} // delete
 	
 	//@Authorize
 	public void save(RestRequest request, RestResponse response) {
 		try {
 			// validate
 			utilSvc.validateParams(request, response);
-						
+			
 			if ((Boolean) request.getParam(GlobalConstant.VALID) == false) {
 				utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Validation Error", response);
 				return;
 			}
-						
 			// get existing item
-			if (request.containsParam(GlobalConstant.ITEMID) && !request.getParam(GlobalConstant.ITEMID).equals("")) {
-				appTextAdminDao.item(request, response);
+			if (request.containsParam(GlobalConstant.ITEMID) && request.getParam(GlobalConstant.ITEMID) != null && !request.getParam(GlobalConstant.ITEMID).equals("")) {
+				permissionAdminDao.item(request, response);
 				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
 				response.getParams().remove(GlobalConstant.ITEM);
 			} else {
-				AppPageTextName t = new AppPageTextName();
-				t.setArchive(false);
-				t.setLocked(false);
-				request.addParam(GlobalConstant.ITEM, t);
+				Permission permission = new Permission();
+				permission.setArchive(false);
+				permission.setLocked(false);
+				
+				request.addParam(GlobalConstant.ITEM, permission);
 			}
-						
+			
 			// marshall
 			utilSvc.marshallFields(request, response);
 			
-			appTextAdminDao.save(request, response);
-			// reset
-			appCachePageUtil.clearAppPageTextCache();
+			// save
+			permissionAdminDao.save(request, response);
 			
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Save Successful", response);
 		} catch (Exception e) {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Save Failed", response);
+			e.printStackTrace();
+		}
+	} // save
+
+
+	@Override
+	public void rolePermissionIds(RestRequest request, RestResponse response) {
+		try {
+			permissionAdminDao.rolePermissionIds(request, response);
+		} catch (Exception e) {
+			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Item failed", response);
 			e.printStackTrace();
 		}
 	}

@@ -16,7 +16,7 @@
 
 package org.toasthub.admin.repository;
 
-import org.toasthub.core.general.repository.CategoryDao;
+import org.toasthub.core.category.CategoryDao;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 
