@@ -18,6 +18,7 @@ package org.toasthub.admin.general;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,8 +96,8 @@ public class AdminSvcImpl implements ServiceProcessor, AdminSvc {
 	}
 	
 	protected void initMenu(RestRequest request, RestResponse response){
-		Map<Integer,MenuItem> menu = null;
-		Map<String,Map<Integer,MenuItem>> menuList = new HashMap<String,Map<Integer,MenuItem>>();
+		List<MenuItem> menu = null;
+		Map<String,List<MenuItem>> menuList = new HashMap<String,List<MenuItem>>();
 		
 		ArrayList<String> mylist = (ArrayList<String>) request.getParam(GlobalConstant.MENUNAMES);
 		for (String menuName : mylist) {
