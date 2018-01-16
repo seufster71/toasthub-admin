@@ -1,0 +1,3 @@
+[submodule "toasthub-admin/src/main/js/core"]
+	path = toasthub-admin/src/main/js/core
+	url = ssh://seufster@cborghome.ddns.net/opt/gitcborg/toasthub-core-react.git
