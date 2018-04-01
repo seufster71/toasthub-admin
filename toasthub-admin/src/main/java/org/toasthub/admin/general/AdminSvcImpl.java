@@ -68,10 +68,16 @@ public class AdminSvcImpl implements ServiceProcessor, AdminSvc {
 		String action = (String) request.getParams().get(GlobalConstant.ACTION);
 		
 		this.setupDefaults(request);
-		appCachePageUtil.getPageInfo(request,response);
+		//appCachePageUtil.getPageInfo(request,response);
 		switch (action) {
-		case "INIT": 
+		case "INIT":
+			request.addParam("appPageParamLoc", "response");
+			appCachePageUtil.getPageInfo(request,response);
 			this.init(request, response);
+			// get menus
+			if (request.containsParam(GlobalConstant.MENUNAMES)){
+				this.initMenu(request, response);
+			}
 			break;
 		case "INIT_MENU":
 			this.setMenuDefaults(request);
