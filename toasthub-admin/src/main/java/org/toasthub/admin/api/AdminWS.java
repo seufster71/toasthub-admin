@@ -31,7 +31,10 @@ import com.fasterxml.jackson.annotation.JsonView;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.general.model.ServiceClass;
+import org.toasthub.core.preference.model.AppCachePageUtil;
 import org.toasthub.core.serviceCrawler.MicroServiceClient;
+import org.toasthub.security.common.SecurityUtils;
+import org.toasthub.security.model.UserContext;
 
 @RestController()
 @RequestMapping("/api/admin")
@@ -41,8 +44,14 @@ public class AdminWS {
 	UtilSvc utilSvc;
 	
 	@Autowired 
+	UserContext userContext;
+	
+	@Autowired 
 	AppCacheServiceCrawler serviceCrawler;
 
+	@Autowired 
+	AppCachePageUtil appCachePageUtil;
+	
 	@Autowired
 	MicroServiceClient microServiceClient;
 	
@@ -60,14 +69,19 @@ public class AdminWS {
 				(String) request.getParam(GlobalConstant.SVCAPIVERSION), (String) request.getParam(GlobalConstant.SVCAPPVERSION));
 		// process 
 		if (serviceClass != null) {
-			if ("LOCAL".equals(serviceClass.getLocation()) && serviceClass.getServiceProcessor() != null) {
-				// use local service
-				serviceClass.getServiceProcessor().process(request, response);
+			// check permissions
+			if (SecurityUtils.containsPermission(userContext.getCurrentUser(), serviceClass.getPermissionCode(), serviceClass.getPermissionRight())) {
+				if ("LOCAL".equals(serviceClass.getLocation()) && serviceClass.getServiceProcessor() != null) {
+					// use local service
+					serviceClass.getServiceProcessor().process(request, response);
+				} else {
+					// use remote service
+					request.addParam(GlobalConstant.MICROSERVICENAME, "service-admin");
+					request.addParam(GlobalConstant.MICROSERVICEPATH, "api/admin");
+					microServiceClient.process(request, response);
+				}
 			} else {
-				// use remote service
-				request.addParam(GlobalConstant.MICROSERVICENAME, "service-admin");
-				request.addParam(GlobalConstant.MICROSERVICEPATH, "api/admin");
-				microServiceClient.process(request, response);
+				utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACCESSDENIED, appCachePageUtil.getGlobalText("GLOBAL_SERVICE", "GLOBAL_SERVICE_ACCESS_DENIED",userContext.getCurrentUser().getLang()), response);
 			}
 		} else {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.EXECUTIONFAILED, "Service is not available", response);

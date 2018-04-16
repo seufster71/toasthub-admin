@@ -34,6 +34,7 @@ import org.toasthub.core.general.model.MenuItem;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.preference.model.AppCachePageUtil;
+import org.toasthub.security.model.User;
 import org.toasthub.security.model.UserContext;
 
 @Service("AdminSvc")
@@ -68,16 +69,24 @@ public class AdminSvcImpl implements ServiceProcessor, AdminSvc {
 		String action = (String) request.getParams().get(GlobalConstant.ACTION);
 		
 		this.setupDefaults(request);
-		//appCachePageUtil.getPageInfo(request,response);
+		User user = null;
+		String name = "";
+		if (userContext != null && userContext.getCurrentUser() != null){
+			user = userContext.getCurrentUser();
+		} else {
+			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "User is not authenticated", response);
+		}
+		
 		switch (action) {
 		case "INIT":
 			request.addParam("appPageParamLoc", "response");
 			appCachePageUtil.getPageInfo(request,response);
-			this.init(request, response);
+			
 			// get menus
 			if (request.containsParam(GlobalConstant.MENUNAMES)){
 				this.initMenu(request, response);
 			}
+			response.addParam("USER", user);
 			break;
 		case "INIT_MENU":
 			this.setMenuDefaults(request);
@@ -88,17 +97,6 @@ public class AdminSvcImpl implements ServiceProcessor, AdminSvc {
 		}
 		
 	
-	}
-	
-	protected void init(RestRequest request, RestResponse response) {
-		response.addParam(GlobalConstant.PAGELAYOUT,entityManagerMainSvc.getAdminLayout());
-		response.addParam(GlobalConstant.APPNAME,entityManagerMainSvc.getAppName());
-		response.addParam(GlobalConstant.HTMLPREFIX, entityManagerMainSvc.getHTMLPrefix());
-
-		// default language code
-		if (userContext != null && userContext.getCurrentUser() != null){
-			response.addParam("userLang",(userContext.getCurrentUser().getLang()));
-		}
 	}
 	
 	protected void initMenu(RestRequest request, RestResponse response){
