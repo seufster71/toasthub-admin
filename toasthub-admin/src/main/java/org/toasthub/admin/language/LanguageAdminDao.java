@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.toasthub.admin.system.repository;
+package org.toasthub.admin.language;
 
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.system.repository.ClientDomainDao;
+import org.toasthub.core.language.LanguageDao;
 
-public interface ClientDomainAdminDao extends ClientDomainDao {
+public interface LanguageAdminDao extends LanguageDao {
 
 	public void save(RestRequest request, RestResponse response) throws Exception;
 	public void delete(RestRequest request, RestResponse response) throws Exception;

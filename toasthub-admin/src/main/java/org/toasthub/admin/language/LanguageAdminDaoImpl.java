@@ -14,36 +14,38 @@
  * limitations under the License.
  */
 
-package org.toasthub.admin.system.repository;
+package org.toasthub.admin.language;
+
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.toasthub.core.general.model.GlobalConstant;
+import org.toasthub.core.general.model.Language;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.system.model.ClientDomain;
-import org.toasthub.core.system.repository.ClientDomainDaoImpl;
+import org.toasthub.core.language.LanguageDaoImpl;
 
-@Repository("ClientDomainAdminDaoImpl")
-@Transactional("TransactionManagerMain")
-public class ClientDomainAdminDaoImpl extends ClientDomainDaoImpl implements ClientDomainAdminDao {
-
+@Repository("LanguageAdminDao")
+@Transactional("TransactionManagerData")
+public class LanguageAdminDaoImpl extends LanguageDaoImpl implements LanguageAdminDao {
+	
 	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
-		ClientDomain clientDomain = (ClientDomain) request.getParam(GlobalConstant.ITEM);
-		entityManagerMainSvc.getEntityMgrMain().merge(clientDomain);
+		Language language = (Language) request.getParam(GlobalConstant.ITEM);
+		entityManagerDataSvc.getInstance().merge(language);
 	}
-	
+
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
 			
-			ClientDomain clientDomain = (ClientDomain) entityManagerMainSvc.getEntityMgrMain().getReference(ClientDomain.class,  new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
-			entityManagerMainSvc.getEntityMgrMain().remove(clientDomain);
+			Language language = (Language) entityManagerDataSvc.getInstance().getReference(Language.class,  new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			entityManagerDataSvc.getInstance().remove(language);
 			
 		} else {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);
 		}
 		
 	}
+
 }

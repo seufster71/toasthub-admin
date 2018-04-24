@@ -14,35 +14,36 @@
  * limitations under the License.
  */
 
-package org.toasthub.admin.repository;
+package org.toasthub.admin.system.clientDomain;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.toasthub.core.general.model.GlobalConstant;
-import org.toasthub.core.category.CategoryDaoImpl;
-import org.toasthub.core.general.model.Category;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
+import org.toasthub.core.system.model.ClientDomain;
+import org.toasthub.core.system.repository.ClientDomainDaoImpl;
 
-@Repository("CategoryAdminDao")
-@Transactional("TransactionManagerData")
-public class CategoryAdminDaoImpl extends CategoryDaoImpl implements CategoryAdminDao {
-	
-	//@Authorize
+@Repository("ClientDomainAdminDaoImpl")
+@Transactional("TransactionManagerMain")
+public class ClientDomainAdminDaoImpl extends ClientDomainDaoImpl implements ClientDomainAdminDao {
+
+	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
-		Category category = (Category) request.getParam("category");
-		
+		ClientDomain clientDomain = (ClientDomain) request.getParam(GlobalConstant.ITEM);
+		entityManagerMainSvc.getEntityMgrMain().merge(clientDomain);
 	}
 	
-	//@Authorize
+	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
 			
-			Category category = (Category) entityManagerDataSvc.getInstance().getReference(Category.class,  new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
-			entityManagerDataSvc.getInstance().remove(category);
+			ClientDomain clientDomain = (ClientDomain) entityManagerMainSvc.getEntityMgrMain().getReference(ClientDomain.class,  new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			entityManagerMainSvc.getEntityMgrMain().remove(clientDomain);
 			
 		} else {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);
 		}
+		
 	}
 }

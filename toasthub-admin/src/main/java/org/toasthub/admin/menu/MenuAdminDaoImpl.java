@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.toasthub.admin.repository;
+package org.toasthub.admin.menu;
 
 
 import org.springframework.stereotype.Repository;

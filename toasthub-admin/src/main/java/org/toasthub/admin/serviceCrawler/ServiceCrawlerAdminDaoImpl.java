@@ -14,34 +14,33 @@
  * limitations under the License.
  */
 
-package org.toasthub.admin.repository;
-
+package org.toasthub.admin.serviceCrawler;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.toasthub.core.general.model.GlobalConstant;
-import org.toasthub.core.general.model.Language;
+import org.toasthub.core.general.model.ServiceClass;
+import org.toasthub.core.serviceCrawler.ServiceCrawlerDaoImpl;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.language.LanguageDaoImpl;
 
-@Repository("LanguageAdminDao")
+@Repository("ServiceCrawlerAdminDao")
 @Transactional("TransactionManagerData")
-public class LanguageAdminDaoImpl extends LanguageDaoImpl implements LanguageAdminDao {
+public class ServiceCrawlerAdminDaoImpl extends ServiceCrawlerDaoImpl implements ServiceCrawlerAdminDao {
 	
 	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
-		Language language = (Language) request.getParam(GlobalConstant.ITEM);
-		entityManagerDataSvc.getInstance().merge(language);
+		ServiceClass serviceClass = (ServiceClass) request.getParam(GlobalConstant.ITEM);
+		entityManagerDataSvc.getInstance().merge(serviceClass);
 	}
 
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
-			
-			Language language = (Language) entityManagerDataSvc.getInstance().getReference(Language.class,  new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
-			entityManagerDataSvc.getInstance().remove(language);
-			
+			ServiceClass serviceClass = (ServiceClass) entityManagerDataSvc.getInstance().getReference(ServiceClass.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			entityManagerDataSvc.getInstance().remove(serviceClass);
+				
+			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Item deleted", response);
 		} else {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);
 		}

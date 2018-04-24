@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.toasthub.admin.repository;
+package org.toasthub.admin.system.clientDomain;
 
-import org.toasthub.core.category.CategoryDao;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
+import org.toasthub.core.system.repository.ClientDomainDao;
 
-public interface CategoryAdminDao extends CategoryDao {
+public interface ClientDomainAdminDao extends ClientDomainDao {
 
 	public void save(RestRequest request, RestResponse response) throws Exception;
 	public void delete(RestRequest request, RestResponse response) throws Exception;

@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package org.toasthub.admin.system.service;
+package org.toasthub.admin.system.clientDomain;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.toasthub.admin.system.repository.ClientDomainAdminDao;
 import org.toasthub.core.common.UtilSvc;
 import org.toasthub.core.general.handler.ServiceProcessor;
 import org.toasthub.core.general.model.GlobalConstant;

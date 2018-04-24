@@ -19,13 +19,13 @@ package org.toasthub.admin.category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.toasthub.admin.repository.CategoryAdminDao;
 import org.toasthub.core.category.CategorySvcImpl;
 import org.toasthub.core.common.UtilSvc;
 import org.toasthub.core.general.handler.ServiceProcessor;
 import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
+import org.toasthub.core.preference.model.AppCachePageUtil;
 
 @Service("CategoryAdminSvc")
 public class CategoryAdminSvcImpl extends CategorySvcImpl implements ServiceProcessor, CategoryAdminSvc {
@@ -35,18 +35,29 @@ public class CategoryAdminSvcImpl extends CategorySvcImpl implements ServiceProc
 	CategoryAdminDao categoryAdminDao;
 	
 	@Autowired 
+	AppCachePageUtil appCachePageUtil;
+	
+	@Autowired 
 	UtilSvc utilSvc;
 	
 	@Override
 	public void process(RestRequest request, RestResponse response) {
 		String action = (String) request.getParams().get(GlobalConstant.ACTION);
-		
+		request.addParam(GlobalConstant.ITEMNAME, "Category");
 		Long count = 0l;
 		switch (action) {
 		case "INIT":
-			this.items(request, response);
+			request.addParam("appPageParamLoc", "response");
+			appCachePageUtil.getPageInfo(request,response);
+			this.itemCount(request, response);
+			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
+			if (count != null && count > 0){
+				this.items(request, response);
+			}
 			break;
 		case "LIST":
+			request.addParam("appPageParamLoc", "response");
+			appCachePageUtil.getPageInfo(request,response);
 			itemCount(request, response);
 			count = (Long) response.getParam("count");
 			if (count != null && count > 0){
