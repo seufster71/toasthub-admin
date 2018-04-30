@@ -68,7 +68,6 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 			if (request.containsParam("userId")){
 				this.userRoleIds(request, response);
 			}
-			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
 		case "SHOW":
 			this.item(request, response);
