@@ -17,6 +17,7 @@
 package org.toasthub.admin.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,7 +35,7 @@ import org.toasthub.core.general.model.ServiceClass;
 import org.toasthub.core.preference.model.AppCachePageUtil;
 import org.toasthub.core.serviceCrawler.MicroServiceClient;
 import org.toasthub.security.common.SecurityUtils;
-import org.toasthub.security.model.UserContext;
+import org.toasthub.security.model.MyUserPrincipal;
 
 @RestController()
 @RequestMapping("/api/admin")
@@ -42,9 +43,6 @@ public class AdminWS {
 
 	@Autowired 
 	UtilSvc utilSvc;
-	
-	@Autowired 
-	UserContext userContext;
 	
 	@Autowired 
 	AppCacheServiceCrawler serviceCrawler;
@@ -63,28 +61,32 @@ public class AdminWS {
 		// set defaults
 		utilSvc.setupDefaults(request);
 		// validate request
-
-		// call service locator
-		ServiceClass serviceClass = serviceCrawler.getServiceClass("ADMIN",(String) request.getParams().get(GlobalConstant.SERVICE),
-				(String) request.getParam(GlobalConstant.SVCAPIVERSION), (String) request.getParam(GlobalConstant.SVCAPPVERSION));
-		// process 
-		if (serviceClass != null) {
-			// check permissions
-			if (SecurityUtils.containsPermission(userContext.getCurrentUser(), serviceClass.getPermissionCode(), serviceClass.getPermissionRight())) {
-				if ("LOCAL".equals(serviceClass.getLocation()) && serviceClass.getServiceProcessor() != null) {
-					// use local service
-					serviceClass.getServiceProcessor().process(request, response);
+		try {
+			MyUserPrincipal principal = (MyUserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			// call service locator
+			ServiceClass serviceClass = serviceCrawler.getServiceClass("ADMIN",(String) request.getParams().get(GlobalConstant.SERVICE),
+					(String) request.getParam(GlobalConstant.SVCAPIVERSION), (String) request.getParam(GlobalConstant.SVCAPPVERSION));
+			// process 
+			if (serviceClass != null) {
+				// check permissions
+				if (SecurityUtils.containsPermission(principal.getUser(), serviceClass.getPermissionCode(), serviceClass.getPermissionRight())) {
+					if ("LOCAL".equals(serviceClass.getLocation()) && serviceClass.getServiceProcessor() != null) {
+						// use local service
+						serviceClass.getServiceProcessor().process(request, response);
+					} else {
+						// use remote service
+						request.addParam(GlobalConstant.MICROSERVICENAME, "service-admin");
+						request.addParam(GlobalConstant.MICROSERVICEPATH, "api/admin");
+						microServiceClient.process(request, response);
+					}
 				} else {
-					// use remote service
-					request.addParam(GlobalConstant.MICROSERVICENAME, "service-admin");
-					request.addParam(GlobalConstant.MICROSERVICEPATH, "api/admin");
-					microServiceClient.process(request, response);
+					utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACCESSDENIED, appCachePageUtil.getGlobalText("GLOBAL_SERVICE", "GLOBAL_SERVICE_ACCESS_DENIED",principal.getUser().getLang()), response);
 				}
 			} else {
-				utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACCESSDENIED, appCachePageUtil.getGlobalText("GLOBAL_SERVICE", "GLOBAL_SERVICE_ACCESS_DENIED",userContext.getCurrentUser().getLang()), response);
+				utilSvc.addStatus(RestResponse.ERROR, RestResponse.EXECUTIONFAILED, "Service is not available", response);
 			}
-		} else {
-			utilSvc.addStatus(RestResponse.ERROR, RestResponse.EXECUTIONFAILED, "Service is not available", response);
+		} catch (Exception e) {
+			utilSvc.addStatus(RestResponse.ERROR, RestResponse.EXECUTIONFAILED, "Service has exceptions", response);
 		}
 		// response
 		response.addParam(GlobalConstant.PAGESTART, request.getParam(GlobalConstant.PAGESTART));
