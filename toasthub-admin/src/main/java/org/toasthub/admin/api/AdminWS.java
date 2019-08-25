@@ -89,8 +89,8 @@ public class AdminWS {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.EXECUTIONFAILED, "Service has exceptions", response);
 		}
 		// response
-		response.addParam(GlobalConstant.PAGESTART, request.getParam(GlobalConstant.PAGESTART));
-		response.addParam(GlobalConstant.PAGELIMIT, request.getParam(GlobalConstant.PAGELIMIT));
+		response.addParam(GlobalConstant.LISTSTART, request.getParam(GlobalConstant.LISTSTART));
+		response.addParam(GlobalConstant.LISTLIMIT, request.getParam(GlobalConstant.LISTLIMIT));
 		return response;
 	}
 	
