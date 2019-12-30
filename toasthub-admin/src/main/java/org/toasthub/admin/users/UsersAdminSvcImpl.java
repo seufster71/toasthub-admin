@@ -71,7 +71,7 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 			}
 			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
-		case "SHOW":
+		case "ITEM":
 			this.item(request, response);
 			break;
 		case "EDIT":
