@@ -16,6 +16,10 @@
 
 package org.toasthub.admin.language;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -52,6 +56,7 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
+			this.itemColumns(request, response);
 			if (count != null && count > 0){
 				this.items(request, response);
 			}
@@ -62,18 +67,25 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
+			this.itemColumns(request, response);
 			if (count != null && count > 0){
 				this.items(request, response);
 			}
 			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
-		case "SHOW":
-			//this.item(request, response);
+		case "ITEM":
+			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
+			appCachePageUtil.getPageInfo(request,response);
+			this.item(request, response);
 			break;
 		case "DELETE":
 			this.delete(request, response);
 			break;
 		case "SAVE":
+			if (!request.containsParam("appForms")) {
+				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_LANGUAGE_FORM"));
+				request.addParam("appForms", forms);
+			}
 			appCachePageUtil.getPageInfo(request,response);
 			this.save(request, response);
 			break;

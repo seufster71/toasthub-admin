@@ -16,6 +16,12 @@
 
 package org.toasthub.admin.users;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import org.picketbox.commons.cipher.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -49,7 +55,7 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 		switch (action) {
 		case "INIT":
 			this.initParams(request);
-			request.addParam("appPageParamLoc", "response");
+			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
 			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
@@ -61,7 +67,7 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 			break;
 		case "LIST":
 			this.initParams(request);
-			request.addParam("appPageParamLoc", "response");
+			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
 			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
@@ -72,6 +78,8 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
 		case "ITEM":
+			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
+			appCachePageUtil.getPageInfo(request,response);
 			this.item(request, response);
 			break;
 		case "EDIT":
@@ -87,6 +95,10 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 			this.delete(request, response);
 			break;
 		case "SAVE":
+			if (!request.containsParam("appForms")) {
+				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_USER_FORM"));
+				request.addParam("appForms", forms);
+			}
 			appCachePageUtil.getPageInfo(request,response);
 			this.save(request, response);
 			break;
@@ -165,16 +177,75 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 			} else {
 				request.addParam(GlobalConstant.ITEM, new User());
 			}
+			// update password
+			
 			// marshall
 			utilSvc.marshallFields(request, response);
 			
-			// save
-			usersAdminDao.save(request, response);
+			User user = (User) request.getParam(GlobalConstant.ITEM);
+			user.setLastPassChange(new Date());
+			
+			// did password match
+			if(!user.getPassword().equals(user.getVerifyPassword())) {
+				utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Password does not match verify password", response);
+				return;
+			}
+			try {
+				
+				// create salt
+				byte[] salt = utilSvc.generateSalt();
+				String ePassword = Base64.encodeBytes(utilSvc.getEncryptedPassword(user.getPassword(),salt));
+				// Save user into main db
+				user.setPassword(ePassword);
+				
+				user.setSalt(Base64.encodeBytes(salt));
+				// code for email confirmation
+				byte[] emailToken = utilSvc.generateSalt();
+				String emailTokenString = Base64.encodeBytes(emailToken);
+				// remove any equals signs
+				emailTokenString = emailTokenString.replaceAll("=|&","0");
+				user.setEmailToken(emailTokenString);
+				// session token
+				byte[] sessionToken = utilSvc.generateSalt();
+				String sessionTokenString = Base64.encodeBytes(sessionToken);
+				user.setSessionToken(sessionTokenString);
+				// Save user into the single sign on db
+				usersAdminDao.save(request, response);
+				
+				// send email confirmation
+				//String urlParams = "action=emailconfirm&username="+user.getUsername()+"&token="+emailTokenString;
+				//mailSvc.sendEmailConfirmation(user.getEmail() ,urlParams);
+				utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Save Successful", response);
+			} 	catch (Exception e) {
+				// find root exception
+				Throwable rootEx = e.getCause();
+				String message = "Registration Failed! Try again";
+				while( rootEx != null) {
+					if (rootEx.getCause() == null) {
+						message = rootEx.getMessage();
+						break;
+					}
+					rootEx = rootEx.getCause();
+				}
+				//helping the user with messages for existing email address and username
+				if (message.contains("Duplicate entry")){
+					if (message.contains("uk_useremail")){
+						message = "Looks like you are already a member. Your email address is in our list!";
+					}else if(message.contains("uk_userpass")){
+						message = "Try a different username, the one you selected is already taken!";
+					}
+				}
+		
+				// need to do some message cleaning
+				utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Save Failed ".concat(message), response);
+			}
+			
+		
 	
 			// reset cache
 			//serviceCrawler.clearCache();
 			
-			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Save Successful", response);
+			
 		} catch (Exception e) {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Save Failed", response);
 			e.printStackTrace();
