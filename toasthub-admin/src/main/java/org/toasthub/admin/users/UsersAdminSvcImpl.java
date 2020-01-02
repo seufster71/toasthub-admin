@@ -82,15 +82,6 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 			appCachePageUtil.getPageInfo(request,response);
 			this.item(request, response);
 			break;
-		case "EDIT":
-			// get form info
-			appCachePageUtil.getPageInfo(request, response);
-			// get item info
-			this.item(request, response);
-			break;
-		case "DISABLE":
-			this.disable(request, response);
-			break;
 		case "DELETE":
 			this.delete(request, response);
 			break;
@@ -114,15 +105,6 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 		}
 		
 		
-	}
-	//@Authorize
-	public void disable(RestRequest request, RestResponse response) {
-		try {
-			usersAdminDao.disable(request, response);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	
 	//@Authorize
@@ -175,21 +157,22 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
 				response.getParams().remove(GlobalConstant.ITEM);
 			} else {
-				request.addParam(GlobalConstant.ITEM, new User());
+				User user = new User();
+				user.setLastPassChange(new Date());
+				request.addParam(GlobalConstant.ITEM, user);
 			}
-			// update password
 			
 			// marshall
 			utilSvc.marshallFields(request, response);
 			
 			User user = (User) request.getParam(GlobalConstant.ITEM);
-			user.setLastPassChange(new Date());
 			
 			// did password match
 			if(!user.getPassword().equals(user.getVerifyPassword())) {
 				utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Password does not match verify password", response);
 				return;
 			}
+			// encrypt password
 			try {
 				
 				// create salt
