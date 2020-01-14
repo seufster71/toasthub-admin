@@ -30,6 +30,7 @@ import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.preference.model.AppCachePageUtil;
+import org.toasthub.security.application.ApplicationSvc;
 import org.toasthub.security.model.Role;
 import org.toasthub.security.role.RoleSvcImpl;
 
@@ -45,6 +46,9 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 	
 	@Autowired 
 	UtilSvc utilSvc;
+	
+	@Autowired
+	ApplicationSvc applicationSvc;
 	
 	@Override
 	public void process(RestRequest request, RestResponse response) {
@@ -74,6 +78,7 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
 			appCachePageUtil.getPageInfo(request,response);
 			this.item(request, response);
+			applicationSvc.selectList(request, response);
 			break;
 		case "DELETE":
 			this.delete(request, response);
@@ -83,6 +88,8 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_ROLE_FORM"));
 				request.addParam("appForms", forms);
 			}
+			List<String> global =  new ArrayList<String>(Arrays.asList("LANGUAGES"));
+			request.addParam("appGlobal", global);
 			appCachePageUtil.getPageInfo(request,response);
 			this.save(request, response);
 			break;

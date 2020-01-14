@@ -17,6 +17,10 @@
 package org.toasthub.admin.permission;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -49,7 +53,7 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 		Long count = 0l;
 		switch (action) {
 		case "INIT":
-			request.addParam("appPageParamLoc", "response");
+			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
 			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
@@ -59,25 +63,28 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
 		case "LIST":
-			request.addParam("appPageParamLoc", "response");
+			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
 			appCachePageUtil.getPageInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
 				this.items(request, response);
 			}
-			if (request.containsParam("roleId")){
-				this.rolePermissionIds(request,response);
-			}
 			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
-		case "SHOW":
+		case "ITEM":
+			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
+			appCachePageUtil.getPageInfo(request,response);
 			this.item(request, response);
 			break;
 		case "DELETE":
 			this.delete(request, response);
 			break;
 		case "SAVE":
+			if (!request.containsParam("appForms")) {
+				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_PERMISSION_FORM"));
+				request.addParam("appForms", forms);
+			}
 			appCachePageUtil.getPageInfo(request,response);
 			this.save(request, response);
 			break;
@@ -90,6 +97,7 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 
 	
 	//@Authorize
+	@Override
 	public void delete(RestRequest request, RestResponse response) {
 		try {
 			permissionAdminDao.delete(request, response);
@@ -101,6 +109,7 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 	} // delete
 	
 	//@Authorize
+	@Override
 	public void save(RestRequest request, RestResponse response) {
 		try {
 			// validate
@@ -136,14 +145,4 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 		}
 	} // save
 
-
-	@Override
-	public void rolePermissionIds(RestRequest request, RestResponse response) {
-		try {
-			permissionAdminDao.rolePermissionIds(request, response);
-		} catch (Exception e) {
-			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Item failed", response);
-			e.printStackTrace();
-		}
-	}
 }

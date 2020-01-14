@@ -24,5 +24,4 @@ public interface PermissionAdminSvc extends PermissionSvc {
 
 	public void delete(RestRequest request, RestResponse response);
 	public void save(RestRequest request, RestResponse response);
-	void rolePermissionIds(RestRequest request, RestResponse response);
 }
