@@ -19,7 +19,9 @@ package org.toasthub.admin.role;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -79,6 +81,12 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 			appCachePageUtil.getPageInfo(request,response);
 			this.item(request, response);
 			applicationSvc.selectList(request, response);
+			// add Select... for first element
+			Map<String,Object> f = new HashMap<String,Object>();
+			f.put("value", 0);
+			//f.put("text", "Select...");
+			f.put("defaultText", "Select...");
+			((List<Map<String,Object>>) response.getParam("applicationSelectList")).add(0,f);
 			break;
 		case "DELETE":
 			this.delete(request, response);
