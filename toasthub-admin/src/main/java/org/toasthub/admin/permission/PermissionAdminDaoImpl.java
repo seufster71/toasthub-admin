@@ -32,8 +32,10 @@ public class PermissionAdminDaoImpl extends PermissionDaoImpl implements Permiss
 	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
 		Permission permission = (Permission) request.getParam(GlobalConstant.ITEM);
+		
 		// get application
-		if (permission.getApplication() == null){
+		if (permission.getApplication() == null || (permission.getApplication() != null && permission.getApplication().getId().equals(permission.getApplicationId()))){
+			permission.setApplication(null);
 			Application application = (Application) entityManagerSecuritySvc.getInstance().getReference(Application.class, permission.getApplicationId());
 			permission.setApplication(application);
 		}

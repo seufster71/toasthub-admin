@@ -138,7 +138,9 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 				return;
 			}
 			// get existing item
-			if (request.containsParam(GlobalConstant.ITEMID) && request.getParam(GlobalConstant.ITEMID) != null && !request.getParam(GlobalConstant.ITEMID).equals("")) {
+			Map<String,Object> inputList = (Map<String, Object>) request.getParam("inputFields");
+			if (inputList.containsKey(GlobalConstant.ITEMID) && inputList.get(GlobalConstant.ITEMID) != null && !"".equals(inputList.get(GlobalConstant.ITEMID))) {
+				request.addParam(GlobalConstant.ITEMID, inputList.get(GlobalConstant.ITEMID));
 				roleAdminDao.item(request, response);
 				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
 				response.getParams().remove(GlobalConstant.ITEM);

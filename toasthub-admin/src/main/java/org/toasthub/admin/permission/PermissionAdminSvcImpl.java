@@ -19,10 +19,13 @@ package org.toasthub.admin.permission;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.toasthub.core.common.UtilSvc;
 import org.toasthub.core.general.handler.ServiceProcessor;
@@ -30,7 +33,9 @@ import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.preference.model.AppCachePageUtil;
+import org.toasthub.security.application.ApplicationSvc;
 import org.toasthub.security.model.Permission;
+import org.toasthub.security.model.RolePermission;
 import org.toasthub.security.permission.PermissionSvcImpl;
 
 @Service("PermissionAdminSvc")
@@ -46,6 +51,9 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 	@Autowired 
 	UtilSvc utilSvc;
 	
+	@Autowired
+	ApplicationSvc applicationSvc;
+	
 	@Override
 	public void process(RestRequest request, RestResponse response) {
 		String action = (String) request.getParams().get(GlobalConstant.ACTION);
@@ -60,6 +68,20 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 			if (count != null && count > 0){
 				items(request, response);
 			}
+			if (request.containsParam("roleId") && !"".equals(request.getParam("roleId"))) {
+				permissionAdminDao.rolePermissionIds(request,response);
+				// add role permissions to items
+				List<RolePermission> rolePermissions = (List<RolePermission>) response.getParam("rolePermissions");
+				List<Permission> permissions = (List<Permission>) response.getParam("items");
+				for (RolePermission rolePermission : rolePermissions) {
+					for (Permission permission : permissions) {
+						if (rolePermission.getPermissionId() == permission.getId()) {
+							permission.setRolePermission(rolePermission);
+						}
+					}
+				}
+				response.addParam("rolePermissions", null);
+			}
 			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
 		case "LIST":
@@ -70,12 +92,33 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 			if (count != null && count > 0){
 				this.items(request, response);
 			}
+			if (request.containsParam("roleId") && !"".equals(request.getParam("roleId"))) {
+				permissionAdminDao.rolePermissionIds(request,response);
+				// add role permissions to items
+				List<RolePermission> rolePermissions = (List<RolePermission>) response.getParam("rolePermissions");
+				List<Permission> permissions = (List<Permission>) response.getParam("items");
+				for (RolePermission rolePermission : rolePermissions) {
+					for (Permission permission : permissions) {
+						if (rolePermission.getPermissionId() == permission.getId()) {
+							permission.setRolePermission(rolePermission);
+						}
+					}
+				}
+				response.addParam("rolePermissions", null);
+			}
 			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
 		case "ITEM":
 			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
 			appCachePageUtil.getPageInfo(request,response);
 			this.item(request, response);
+			applicationSvc.selectList(request, response);
+			// add Select... for first element
+			Map<String,Object> f = new HashMap<String,Object>();
+			f.put("value", 0);
+			//f.put("text", "Select...");
+			f.put("defaultText", "Select...");
+			((List<Map<String,Object>>) response.getParam("applicationSelectList")).add(0,f);
 			break;
 		case "DELETE":
 			this.delete(request, response);
@@ -85,6 +128,8 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_PERMISSION_FORM"));
 				request.addParam("appForms", forms);
 			}
+			List<String> global =  new ArrayList<String>(Arrays.asList("LANGUAGES"));
+			request.addParam("appGlobal", global);
 			appCachePageUtil.getPageInfo(request,response);
 			this.save(request, response);
 			break;
@@ -120,7 +165,9 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 				return;
 			}
 			// get existing item
-			if (request.containsParam(GlobalConstant.ITEMID) && request.getParam(GlobalConstant.ITEMID) != null && !request.getParam(GlobalConstant.ITEMID).equals("")) {
+			Map<String,Object> inputList = (Map<String, Object>) request.getParam("inputFields");
+			if (inputList.containsKey(GlobalConstant.ITEMID) && inputList.get(GlobalConstant.ITEMID) != null && !"".equals(inputList.get(GlobalConstant.ITEMID))) {
+				request.addParam(GlobalConstant.ITEMID, inputList.get(GlobalConstant.ITEMID));
 				permissionAdminDao.item(request, response);
 				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
 				response.getParams().remove(GlobalConstant.ITEM);
@@ -139,6 +186,13 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 			permissionAdminDao.save(request, response);
 			
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Save Successful", response);
+		} catch (DataIntegrityViolationException e) {
+			String message = "Save Failed";
+			if (e.getCause() != null && e.getCause().getCause() != null) {
+				message += ": "+e.getCause().getCause().getMessage();
+			}
+			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, message, response);
+			e.printStackTrace();
 		} catch (Exception e) {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Save Failed", response);
 			e.printStackTrace();

@@ -39,7 +39,8 @@ public class RoleAdminDaoImpl extends RoleDaoImpl implements RoleAdminDao {
 		Role role = (Role) request.getParam(GlobalConstant.ITEM);
 		
 		// get application
-		if (role.getApplication() == null) {
+		if (role.getApplication() == null || (role.getApplication() != null && role.getApplication().getId().equals(role.getApplicationId())) ) {
+			role.setApplication(null);
 			Application application = (Application) entityManagerSecuritySvc.getInstance().getReference(Application.class, role.getApplicationId());
 			role.setApplication(application);
 		}
