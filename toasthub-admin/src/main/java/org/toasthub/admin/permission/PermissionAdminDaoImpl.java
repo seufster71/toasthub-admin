@@ -16,6 +16,8 @@
 
 package org.toasthub.admin.permission;
 
+import javax.persistence.Query;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.toasthub.core.general.model.GlobalConstant;
@@ -23,6 +25,8 @@ import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.security.model.Application;
 import org.toasthub.security.model.Permission;
+import org.toasthub.security.model.Role;
+import org.toasthub.security.model.RolePermission;
 import org.toasthub.security.permission.PermissionDaoImpl;
 
 @Repository("PermissionAdminDao")
@@ -52,6 +56,39 @@ public class PermissionAdminDaoImpl extends PermissionDaoImpl implements Permiss
 		} else {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);
 		}
+		
+	}
+
+	@Override
+	public void rolePermission(RestRequest request, RestResponse response) throws Exception {
+		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
+			String queryStr = "SELECT p FROM RolePermission AS p WHERE p.id =:id";
+			Query query = entityManagerSecuritySvc.getInstance().createQuery(queryStr);
+		
+			query.setParameter("id", new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			RolePermission rolePermission = (RolePermission) query.getSingleResult();
+			
+			response.addParam(GlobalConstant.ITEM, rolePermission);
+		} else {
+			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);
+		}
+		
+	}
+
+	@Override
+	public void rolePermissionSave(RestRequest request, RestResponse response) throws Exception {
+		RolePermission rolePermission = (RolePermission) request.getParam(GlobalConstant.ITEM);
+		
+		if (rolePermission.getRole() == null) {
+			Role role = (Role) entityManagerSecuritySvc.getInstance().getReference(Role.class,  new Long((Integer) request.getParam("roleId")));
+			rolePermission.setRole(role);
+		}
+		if (rolePermission.getPermission() == null) {
+			Permission permission = (Permission) entityManagerSecuritySvc.getInstance().getReference(Permission.class,  new Long((Integer) request.getParam("permissionId")));
+			rolePermission.setPermission(permission);
+		}
+		
+		entityManagerSecuritySvc.getInstance().merge(rolePermission);
 		
 	}
 }

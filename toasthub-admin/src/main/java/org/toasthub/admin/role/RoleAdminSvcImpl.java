@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.toasthub.core.common.UtilSvc;
 import org.toasthub.core.general.handler.ServiceProcessor;
@@ -34,6 +35,8 @@ import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.preference.model.AppCachePageUtil;
 import org.toasthub.security.application.ApplicationSvc;
 import org.toasthub.security.model.Role;
+import org.toasthub.security.model.RolePermission;
+import org.toasthub.security.model.UserRole;
 import org.toasthub.security.role.RoleSvcImpl;
 
 @Service("RoleAdminSvc")
@@ -55,7 +58,7 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 	@Override
 	public void process(RestRequest request, RestResponse response) {
 		String action = (String) request.getParams().get(GlobalConstant.ACTION);
-		
+		List<String> global =  new ArrayList<String>(Arrays.asList("LANGUAGES"));
 		Long count = 0l;
 		switch (action) {
 		case "INIT":
@@ -66,6 +69,19 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 			if (count != null && count > 0){
 				this.items(request, response);
 			}
+			if (request.containsParam("userId") && !"".equals(request.getParam("userId"))) {
+				roleAdminDao.userRoleIds(request, response);
+				// add user role to items
+				List<UserRole> userRoles = (List<UserRole>) response.getParam("userRoles");
+				List<Role> roles = (List<Role>) response.getParam(GlobalConstant.ITEMS);
+				for (UserRole userRole : userRoles) {
+					for (Role role : roles) {
+						if (userRole.getRoleId() == role.getId()) {
+							role.setUserRole(userRole);
+						}
+					}
+				}
+			}
 			break;
 		case "LIST":
 			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
@@ -74,6 +90,19 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
 				this.items(request, response);
+			}
+			if (request.containsParam("userId") && !"".equals(request.getParam("userId"))) {
+				roleAdminDao.userRoleIds(request, response);
+				// add user role to items
+				List<UserRole> userRoles = (List<UserRole>) response.getParam("userRoles");
+				List<Role> roles = (List<Role>) response.getParam(GlobalConstant.ITEMS);
+				for (UserRole userRole : userRoles) {
+					for (Role role : roles) {
+						if (userRole.getRoleId() == role.getId()) {
+							role.setUserRole(userRole);
+						}
+					}
+				}
 			}
 			break;
 		case "ITEM":
@@ -96,16 +125,26 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_ROLE_FORM"));
 				request.addParam("appForms", forms);
 			}
-			List<String> global =  new ArrayList<String>(Arrays.asList("LANGUAGES"));
 			request.addParam("appGlobal", global);
 			appCachePageUtil.getPageInfo(request,response);
 			this.save(request, response);
 			break;
-		case "SAVE_PERMISSION":
-			this.savePermission(request,response);
-			break;
-		case "DELETE_PERMISSION":
-			this.deletePermission(request,response);
+		case "USER_ROLE_ITEM":
+			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
+			appCachePageUtil.getPageInfo(request,response);
+			this.userRole(request, response);
+			if (request.containsParam("roleId")) {
+				response.addParam("roleId", request.getParam("roleId"));
+			}
+			break;	
+		case "USER_ROLE_SAVE":
+			if (!request.containsParam("appForms")) {
+				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_USER_ROLE_FORM"));
+				request.addParam("appForms", forms);
+			}
+			request.addParam("appGlobal", global);
+			appCachePageUtil.getPageInfo(request,response);
+			this.userRoleSave(request, response);
 			break;
 		default:
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.ACTIONNOTEXIST, "Action not available", response);
@@ -158,58 +197,72 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 			roleAdminDao.save(request, response);
 			
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Save Successful", response);
+		} catch (DataIntegrityViolationException e) {
+			String message = "Save Failed";
+			if (e.getCause() != null && e.getCause().getCause() != null) {
+				message += ": "+e.getCause().getCause().getMessage();
+			}
+			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, message, response);
+			e.printStackTrace();
 		} catch (Exception e) {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Save Failed", response);
-			e.printStackTrace();
-		}
-	}
-	
-	//@Authorize
-	@Override
-	public void savePermission(RestRequest request, RestResponse response) {
-		try {
-			
-			// get existing item
-			if (request.containsParam(GlobalConstant.ITEMID) && !request.getParam(GlobalConstant.ITEMID).equals("")) {
-				
-				roleAdminDao.savePermission(request, response);
-			}
-			
-			
-			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Save Successful", response);
-		} catch (Exception e) {
-			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Save Failed", response);
-			e.printStackTrace();
-		}
-	}
-	
-	//@Authorize
-	@Override
-	public void deletePermission(RestRequest request, RestResponse response) {
-		try {
-			
-			// get existing item
-			if (request.containsParam(GlobalConstant.ITEMID) && !request.getParam(GlobalConstant.ITEMID).equals("")) {
-				
-				roleAdminDao.deletePermission(request, response);
-			}
-			
-			
-			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Delete Successful", response);
-		} catch (Exception e) {
-			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Delete Failed", response);
 			e.printStackTrace();
 		}
 	}
 
 	@Override
-	public void userRoleIds(RestRequest request, RestResponse response) {
+	public void userRole(RestRequest request, RestResponse response) {
 		try {
-			roleAdminDao.userRoleIds(request, response);
+			roleAdminDao.userRole(request, response);
+			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Successful", response);
 		} catch (Exception e) {
-			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Item failed", response);
+			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Failed", response);
 			e.printStackTrace();
 		}
-		
-	}
+	} // userRole
+
+	@Override
+	public void userRoleSave(RestRequest request, RestResponse response) {
+		try {
+			// validate
+			utilSvc.validateParams(request, response);
+			
+			if ((Boolean) request.getParam(GlobalConstant.VALID) == false) {
+				utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Validation Error", response);
+				return;
+			}
+			// get existing item
+			Map<String,Object> inputList = (Map<String, Object>) request.getParam("inputFields");
+			if (inputList.containsKey(GlobalConstant.ITEMID) && inputList.get(GlobalConstant.ITEMID) != null && !"".equals(inputList.get(GlobalConstant.ITEMID))) {
+				request.addParam(GlobalConstant.ITEMID, inputList.get(GlobalConstant.ITEMID));
+				roleAdminDao.userRole(request, response);
+				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
+				response.getParams().remove(GlobalConstant.ITEM);
+			} else {
+				RolePermission rolePermission = new RolePermission();
+				rolePermission.setArchive(false);
+				rolePermission.setLocked(false);
+				
+				request.addParam(GlobalConstant.ITEM, rolePermission);
+			}
+			
+			// marshall
+			utilSvc.marshallFields(request, response);
+			
+			// save
+			roleAdminDao.userRoleSave(request, response);
+			
+			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Save Successful", response);
+		} catch (DataIntegrityViolationException e) {
+			String message = "Save Failed";
+			if (e.getCause() != null && e.getCause().getCause() != null) {
+				message += ": "+e.getCause().getCause().getMessage();
+			}
+			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, message, response);
+			e.printStackTrace();
+		} catch (Exception e) {
+			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Save Failed", response);
+			e.printStackTrace();
+		}
+	} // userRoleSave
 }

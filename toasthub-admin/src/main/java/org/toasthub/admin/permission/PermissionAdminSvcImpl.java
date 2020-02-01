@@ -57,7 +57,7 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 	@Override
 	public void process(RestRequest request, RestResponse response) {
 		String action = (String) request.getParams().get(GlobalConstant.ACTION);
-		
+		List<String> global =  new ArrayList<String>(Arrays.asList("LANGUAGES"));
 		Long count = 0l;
 		switch (action) {
 		case "INIT":
@@ -72,7 +72,7 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 				permissionAdminDao.rolePermissionIds(request,response);
 				// add role permissions to items
 				List<RolePermission> rolePermissions = (List<RolePermission>) response.getParam("rolePermissions");
-				List<Permission> permissions = (List<Permission>) response.getParam("items");
+				List<Permission> permissions = (List<Permission>) response.getParam(GlobalConstant.ITEMS);
 				for (RolePermission rolePermission : rolePermissions) {
 					for (Permission permission : permissions) {
 						if (rolePermission.getPermissionId() == permission.getId()) {
@@ -128,10 +128,26 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_PERMISSION_FORM"));
 				request.addParam("appForms", forms);
 			}
-			List<String> global =  new ArrayList<String>(Arrays.asList("LANGUAGES"));
 			request.addParam("appGlobal", global);
 			appCachePageUtil.getPageInfo(request,response);
 			this.save(request, response);
+			break;
+		case "ROLE_PERMISSION_ITEM":
+			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
+			appCachePageUtil.getPageInfo(request,response);
+			this.rolePermission(request, response);
+			if (request.containsParam("permissionId")) {
+				response.addParam("permissionId", request.getParam("permissionId"));
+			}
+			break;	
+		case "ROLE_PERMISSION_SAVE":
+			if (!request.containsParam("appForms")) {
+				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_ROLE_PERMISSION_FORM"));
+				request.addParam("appForms", forms);
+			}
+			request.addParam("appGlobal", global);
+			appCachePageUtil.getPageInfo(request,response);
+			this.rolePermissionSave(request, response);
 			break;
 		default:
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.ACTIONNOTEXIST, "Action not available", response);
@@ -198,5 +214,63 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 			e.printStackTrace();
 		}
 	} // save
+
+
+	@Override
+	public void rolePermission(RestRequest request, RestResponse response) {
+		try {
+			permissionAdminDao.rolePermission(request, response);
+			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Successful", response);
+		} catch (Exception e) {
+			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Failed", response);
+			e.printStackTrace();
+		}
+	} // rolePermission
+
+
+	@Override
+	public void rolePermissionSave(RestRequest request, RestResponse response) {
+		try {
+			// validate
+			utilSvc.validateParams(request, response);
+			
+			if ((Boolean) request.getParam(GlobalConstant.VALID) == false) {
+				utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Validation Error", response);
+				return;
+			}
+			// get existing item
+			Map<String,Object> inputList = (Map<String, Object>) request.getParam("inputFields");
+			if (inputList.containsKey(GlobalConstant.ITEMID) && inputList.get(GlobalConstant.ITEMID) != null && !"".equals(inputList.get(GlobalConstant.ITEMID))) {
+				request.addParam(GlobalConstant.ITEMID, inputList.get(GlobalConstant.ITEMID));
+				permissionAdminDao.rolePermission(request, response);
+				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
+				response.getParams().remove(GlobalConstant.ITEM);
+			} else {
+				RolePermission rolePermission = new RolePermission();
+				rolePermission.setArchive(false);
+				rolePermission.setLocked(false);
+				
+				request.addParam(GlobalConstant.ITEM, rolePermission);
+			}
+			
+			// marshall
+			utilSvc.marshallFields(request, response);
+			
+			// save
+			permissionAdminDao.rolePermissionSave(request, response);
+			
+			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Save Successful", response);
+		} catch (DataIntegrityViolationException e) {
+			String message = "Save Failed";
+			if (e.getCause() != null && e.getCause().getCause() != null) {
+				message += ": "+e.getCause().getCause().getMessage();
+			}
+			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, message, response);
+			e.printStackTrace();
+		} catch (Exception e) {
+			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Save Failed", response);
+			e.printStackTrace();
+		}
+	} // rolePermissionSave
 
 }

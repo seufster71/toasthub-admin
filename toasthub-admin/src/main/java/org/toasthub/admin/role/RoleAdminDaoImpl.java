@@ -24,9 +24,9 @@ import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.security.model.Application;
-import org.toasthub.security.model.Permission;
 import org.toasthub.security.model.Role;
-import org.toasthub.security.model.RolePermission;
+import org.toasthub.security.model.User;
+import org.toasthub.security.model.UserRole;
 import org.toasthub.security.role.RoleDaoImpl;
 
 @Repository("RoleAdminDao")
@@ -63,29 +63,36 @@ public class RoleAdminDaoImpl extends RoleDaoImpl implements RoleAdminDao {
 		
 	}
 	
+
 	@Override
-	public void savePermission(RestRequest request, RestResponse response) throws Exception {
-		// get Role
-		Role role = (Role) entityManagerSecuritySvc.getInstance().getReference(Role.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
-		// get Permission
-		Permission permission = (Permission) entityManagerSecuritySvc.getInstance().getReference(Permission.class, new Long((Integer) request.getParam("permissionId")));
-		// save
-		entityManagerSecuritySvc.getInstance().merge(new RolePermission(role,permission));
+	public void userRole(RestRequest request, RestResponse response) throws Exception {
+		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
+			String queryStr = "SELECT r FROM UserRole AS r WHERE r.id =:id";
+			Query query = entityManagerSecuritySvc.getInstance().createQuery(queryStr);
 		
+			query.setParameter("id", new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			UserRole userRole = (UserRole) query.getSingleResult();
+			
+			response.addParam(GlobalConstant.ITEM, userRole);
+		} else {
+			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);
+		}
 		
 	}
 
 	@Override
-	public void deletePermission(RestRequest request, RestResponse response) throws Exception {
+	public void userRoleSave(RestRequest request, RestResponse response) throws Exception {
+		UserRole userRole = (UserRole) request.getParam(GlobalConstant.ITEM);
 		
-		String queryStr = "SELECT rp FROM RolePermission AS rp WHERE rp.role.id =:rid AND rp.permission.id =:pid";
-		Query query = entityManagerSecuritySvc.getInstance().createQuery(queryStr);
-	
-		query.setParameter("rid", new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
-		query.setParameter("pid", new Long((Integer) request.getParam("permissionId")));
-		RolePermission rolePermission = (RolePermission) query.getSingleResult();
+		if (userRole.getRole() == null) {
+			Role role = (Role) entityManagerSecuritySvc.getInstance().getReference(Role.class,  new Long((Integer) request.getParam("roleId")));
+			userRole.setRole(role);
+		}
+		if (userRole.getUser() == null) {
+			User user = (User) entityManagerSecuritySvc.getInstance().getReference(User.class,  new Long((Integer) request.getParam("permissionId")));
+			userRole.setUser(user);
+		}
 		
-		// remove
-		entityManagerSecuritySvc.getInstance().remove(rolePermission);
+		entityManagerSecuritySvc.getInstance().merge(userRole);
 	}
 }

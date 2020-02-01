@@ -24,7 +24,7 @@ public interface RoleAdminSvc extends RoleSvc {
 
 	void delete(RestRequest request, RestResponse response);
 	void save(RestRequest request, RestResponse response);
-	void savePermission(RestRequest request, RestResponse response);
-	void deletePermission(RestRequest request, RestResponse response);
-	void userRoleIds(RestRequest request, RestResponse response);
+	
+	public void userRole(RestRequest request, RestResponse response);
+	public void userRoleSave(RestRequest request, RestResponse response);
 }

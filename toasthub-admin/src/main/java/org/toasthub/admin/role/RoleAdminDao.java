@@ -24,6 +24,6 @@ public interface RoleAdminDao extends RoleDao {
 
 	public void save(RestRequest request, RestResponse response) throws Exception;
 	public void delete(RestRequest request, RestResponse response) throws Exception;
-	public void savePermission(RestRequest request, RestResponse response) throws Exception;
-	public void deletePermission(RestRequest request, RestResponse response) throws Exception;
+	public void userRole(RestRequest request, RestResponse response) throws Exception;
+	public void userRoleSave(RestRequest request, RestResponse response) throws Exception;
 }
