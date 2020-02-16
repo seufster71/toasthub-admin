@@ -16,9 +16,9 @@
 
 package org.toasthub.admin.users;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import org.picketbox.commons.cipher.Base64;
@@ -158,7 +158,7 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 				response.getParams().remove(GlobalConstant.ITEM);
 			} else {
 				User user = new User();
-				user.setLastPassChange(new Date());
+				user.setLastPassChange(Instant.now());
 				request.addParam(GlobalConstant.ITEM, user);
 			}
 			
