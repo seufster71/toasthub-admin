@@ -16,6 +16,8 @@
 
 package org.toasthub.admin.role;
 
+import java.util.List;
+
 import javax.persistence.Query;
 
 import org.springframework.stereotype.Repository;
@@ -25,6 +27,7 @@ import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.security.model.Application;
 import org.toasthub.security.model.Role;
+import org.toasthub.security.model.RolePermission;
 import org.toasthub.security.model.User;
 import org.toasthub.security.model.UserRole;
 import org.toasthub.security.role.RoleDaoImpl;
@@ -54,6 +57,18 @@ public class RoleAdminDaoImpl extends RoleDaoImpl implements RoleAdminDao {
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
 			
+			// Delete rolePermissions
+			String queryStr = "SELECT rp.id FROM RolePermission AS rp WHERE rp.role.id =:id";
+			Query query = entityManagerSecuritySvc.getInstance().createQuery(queryStr);
+			query.setParameter("id", new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			List<Long> permissionIds = query.getResultList();
+				
+			for(Long id : permissionIds) {
+				RolePermission rolePermission = (RolePermission) entityManagerSecuritySvc.getInstance().getReference(RolePermission.class, id);
+				entityManagerSecuritySvc.getInstance().remove(rolePermission);
+			}
+			
+			// Delete Role
 			Role role = (Role) entityManagerSecuritySvc.getInstance().getReference(Role.class,  new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
 			entityManagerSecuritySvc.getInstance().remove(role);
 			
@@ -89,7 +104,7 @@ public class RoleAdminDaoImpl extends RoleDaoImpl implements RoleAdminDao {
 			userRole.setRole(role);
 		}
 		if (userRole.getUser() == null) {
-			User user = (User) entityManagerSecuritySvc.getInstance().getReference(User.class,  new Long((Integer) request.getParam("permissionId")));
+			User user = (User) entityManagerSecuritySvc.getInstance().getReference(User.class,  new Long((Integer) request.getParam("userId")));
 			userRole.setUser(user);
 		}
 		

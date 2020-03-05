@@ -35,7 +35,6 @@ import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.preference.model.AppCachePageUtil;
 import org.toasthub.security.application.ApplicationSvc;
 import org.toasthub.security.model.Role;
-import org.toasthub.security.model.RolePermission;
 import org.toasthub.security.model.UserRole;
 import org.toasthub.security.role.RoleSvcImpl;
 
@@ -239,11 +238,11 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
 				response.getParams().remove(GlobalConstant.ITEM);
 			} else {
-				RolePermission rolePermission = new RolePermission();
-				rolePermission.setArchive(false);
-				rolePermission.setLocked(false);
+				UserRole userRole = new UserRole();
+				userRole.setArchive(false);
+				userRole.setLocked(false);
 				
-				request.addParam(GlobalConstant.ITEM, rolePermission);
+				request.addParam(GlobalConstant.ITEM, userRole);
 			}
 			
 			// marshall

@@ -16,6 +16,8 @@
 
 package org.toasthub.admin.users;
 
+import java.util.List;
+
 import javax.persistence.Query;
 
 import org.springframework.stereotype.Repository;
@@ -40,9 +42,22 @@ public class UsersAdminDaoImpl extends UsersDaoImpl implements UsersAdminDao {
 	
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
-		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
+		if (response.containsParam(GlobalConstant.ITEM) && !"".equals(response.getParam(GlobalConstant.ITEM))) {
 			
-			User user = (User) entityManagerSecuritySvc.getInstance().getReference(User.class,  new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			User userX = (User) response.getParam(GlobalConstant.ITEM);
+			// delete userRoles
+			String queryStr = "SELECT ur.id FROM UserRole AS ur WHERE ur.user.id =:id";
+			Query query = entityManagerSecuritySvc.getInstance().createQuery(queryStr);
+			query.setParameter("id", userX.getId());
+			List<Long> roleIds = query.getResultList();
+			
+			for(Long id : roleIds) {
+				UserRole userRole = (UserRole) entityManagerSecuritySvc.getInstance().getReference(UserRole.class, id);
+				entityManagerSecuritySvc.getInstance().remove(userRole);
+			}
+			
+			// delete user
+			User user = (User) entityManagerSecuritySvc.getInstance().getReference(User.class,  userX.getId());
 			entityManagerSecuritySvc.getInstance().remove(user);
 			
 		} else {
