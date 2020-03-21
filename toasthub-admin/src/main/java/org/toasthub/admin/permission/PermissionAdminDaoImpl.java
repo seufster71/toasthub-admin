@@ -52,7 +52,7 @@ public class PermissionAdminDaoImpl extends PermissionDaoImpl implements Permiss
 			
 			Permission permission = (Permission) entityManagerSecuritySvc.getInstance().getReference(Permission.class,  new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
 			entityManagerSecuritySvc.getInstance().remove(permission);
-			
+			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Delete Successful", response);
 		} else {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);
 		}

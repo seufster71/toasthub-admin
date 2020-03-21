@@ -47,9 +47,6 @@ public class RoleAdminDaoImpl extends RoleDaoImpl implements RoleAdminDao {
 			Application application = (Application) entityManagerSecuritySvc.getInstance().getReference(Application.class, role.getApplicationId());
 			role.setApplication(application);
 		}
-		
-		// get permissions
-		
 		entityManagerSecuritySvc.getInstance().merge(role);
 	}
 	

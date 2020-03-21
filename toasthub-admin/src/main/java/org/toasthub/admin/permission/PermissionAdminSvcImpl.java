@@ -162,7 +162,7 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 	public void delete(RestRequest request, RestResponse response) {
 		try {
 			permissionAdminDao.delete(request, response);
-			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Delete Successful", response);
+			
 		} catch (Exception e) {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Delete Failed", response);
 			e.printStackTrace();
