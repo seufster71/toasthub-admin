@@ -19,6 +19,7 @@ package org.toasthub.admin.language;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -48,6 +49,7 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 	@Override
 	public void process(RestRequest request, RestResponse response) {
 		String action = (String) request.getParams().get(GlobalConstant.ACTION);
+		List<String> global =  new ArrayList<String>(Arrays.asList("LANGUAGES"));
 		
 		Long count = 0l;
 		switch (action) {
@@ -86,6 +88,7 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_LANGUAGE_FORM"));
 				request.addParam("appForms", forms);
 			}
+			request.addParam("appGlobal", global);
 			appCachePageUtil.getPageInfo(request,response);
 			this.save(request, response);
 			break;
@@ -119,12 +122,17 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 				return;
 			}
 			// get existing item
-			if (request.containsParam(GlobalConstant.ITEMID) && !request.getParam(GlobalConstant.ITEMID).equals("")) {
+			Map<String,Object> inputList = (Map<String, Object>) request.getParam("inputFields");
+			if (inputList.containsKey(GlobalConstant.ITEMID) && inputList.get(GlobalConstant.ITEMID) != null && !"".equals(inputList.get(GlobalConstant.ITEMID))) {
+				request.addParam(GlobalConstant.ITEMID, inputList.get(GlobalConstant.ITEMID));
 				languageAdminDao.item(request, response);
 				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
 				response.getParams().remove(GlobalConstant.ITEM);
 			} else {
-				request.addParam(GlobalConstant.ITEM, new Language());
+				Language language = new Language();
+				language.setArchive(false);
+				language.setLocked(false);
+				request.addParam(GlobalConstant.ITEM, language);
 			}
 			// marshall
 			utilSvc.marshallFields(request, response);
