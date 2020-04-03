@@ -19,25 +19,25 @@ package org.toasthub.admin.preference.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.toasthub.admin.preference.repository.AppTextAdminDao;
+import org.toasthub.admin.preference.repository.PrefTextAdminDao;
 import org.toasthub.core.common.UtilSvc;
 import org.toasthub.core.general.handler.ServiceProcessor;
 import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.preference.model.AppCachePageUtil;
-import org.toasthub.core.preference.model.AppPageTextName;
-import org.toasthub.core.preference.service.AppTextSvcImpl;
+import org.toasthub.core.preference.model.PrefCacheUtil;
+import org.toasthub.core.preference.model.PrefTextName;
+import org.toasthub.core.preference.service.PrefTextSvcImpl;
 
-@Service("AppTextAdminSvc")
-public class AppTextAdminSvcImpl extends AppTextSvcImpl implements ServiceProcessor, AppTextAdminSvc {
+@Service("PrefTextAdminSvc")
+public class PrefTextAdminSvcImpl extends PrefTextSvcImpl implements ServiceProcessor, PrefTextAdminSvc {
 
 	@Autowired 
-	@Qualifier("AppTextAdminDao")
-	AppTextAdminDao appTextAdminDao;
+	@Qualifier("PrefTextAdminDao")
+	PrefTextAdminDao prefTextAdminDao;
 	
 	@Autowired 
-	AppCachePageUtil appCachePageUtil;
+	PrefCacheUtil prefCacheUtil;
 	
 	@Autowired 
 	UtilSvc utilSvc;
@@ -46,10 +46,12 @@ public class AppTextAdminSvcImpl extends AppTextSvcImpl implements ServiceProces
 	public void process(RestRequest request, RestResponse response) {
 		String action = (String) request.getParams().get(GlobalConstant.ACTION);
 		
-		appCachePageUtil.getPageInfo(request,response);
+		prefCacheUtil.getPrefInfo(request,response);
 		Long count = 0l;
 		switch (action) {
 		case "INIT":
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -57,12 +59,14 @@ public class AppTextAdminSvcImpl extends AppTextSvcImpl implements ServiceProces
 			}
 			break;
 		case "LIST":
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
 				items(request, response);
 			}
-			response.addParam(GlobalConstant.PARENTID, request.getParam(GlobalConstant.PARENTID));
+			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "", response);
 			break;
 		case "SHOW":
 			this.item(request, response);
@@ -82,9 +86,9 @@ public class AppTextAdminSvcImpl extends AppTextSvcImpl implements ServiceProces
 	//@Authorize
 	public void delete(RestRequest request, RestResponse response) {
 		try {
-			appTextAdminDao.delete(request, response);
+			prefTextAdminDao.delete(request, response);
 			// reset
-			appCachePageUtil.clearAppPageTextCache();
+			prefCacheUtil.clearPrefTextCache();
 			
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Delete Successful", response);
 		} catch (Exception e) {
@@ -106,11 +110,11 @@ public class AppTextAdminSvcImpl extends AppTextSvcImpl implements ServiceProces
 						
 			// get existing item
 			if (request.containsParam(GlobalConstant.ITEMID) && !request.getParam(GlobalConstant.ITEMID).equals("")) {
-				appTextAdminDao.item(request, response);
+				prefTextAdminDao.item(request, response);
 				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
 				response.getParams().remove(GlobalConstant.ITEM);
 			} else {
-				AppPageTextName t = new AppPageTextName();
+				PrefTextName t = new PrefTextName();
 				t.setArchive(false);
 				t.setLocked(false);
 				request.addParam(GlobalConstant.ITEM, t);
@@ -119,9 +123,9 @@ public class AppTextAdminSvcImpl extends AppTextSvcImpl implements ServiceProces
 			// marshall
 			utilSvc.marshallFields(request, response);
 			
-			appTextAdminDao.save(request, response);
+			prefTextAdminDao.save(request, response);
 			// reset
-			appCachePageUtil.clearAppPageTextCache();
+			prefCacheUtil.clearPrefTextCache();
 			
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Save Successful", response);
 		} catch (Exception e) {

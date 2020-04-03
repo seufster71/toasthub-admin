@@ -22,29 +22,29 @@ import org.springframework.transaction.annotation.Transactional;
 import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.preference.model.AppPageLabelName;
-import org.toasthub.core.preference.model.AppPageName;
-import org.toasthub.core.preference.repository.AppLabelDaoImpl;
+import org.toasthub.core.preference.model.PrefLabelName;
+import org.toasthub.core.preference.model.PrefName;
+import org.toasthub.core.preference.repository.PrefLabelDaoImpl;
 
-@Repository("AppLabelAdminDao")
+@Repository("PrefLabelAdminDao")
 @Transactional("TransactionManagerData")
-public class AppLabelAdminDaoImpl extends AppLabelDaoImpl implements AppLabelAdminDao {
+public class PrefLabelAdminDaoImpl extends PrefLabelDaoImpl implements PrefLabelAdminDao {
 
 	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
-		AppPageLabelName appPageLabelName = (AppPageLabelName) request.getParam(GlobalConstant.ITEM);
-		if (appPageLabelName.getPageName() == null) {
-			AppPageName appPageName = (AppPageName) entityManagerDataSvc.getInstance().getReference(AppPageName.class, new Long((Integer) request.getParam("parentId")));
-			appPageLabelName.setPageName(appPageName);
+		PrefLabelName prefLabelName = (PrefLabelName) request.getParam(GlobalConstant.ITEM);
+		if (prefLabelName.getPrefName() == null) {
+			PrefName prefName = (PrefName) entityManagerDataSvc.getInstance().getReference(PrefName.class, new Long((Integer) request.getParam("parentId")));
+			prefLabelName.setPrefName(prefName);
 		}
-		entityManagerDataSvc.getInstance().merge(appPageLabelName);
+		entityManagerDataSvc.getInstance().merge(prefLabelName);
 	}
 	
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
-			AppPageLabelName appPageLabelName = (AppPageLabelName) entityManagerDataSvc.getInstance().getReference(AppPageLabelName.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
-			entityManagerDataSvc.getInstance().remove(appPageLabelName);
+			PrefLabelName prefLabelName = (PrefLabelName) entityManagerDataSvc.getInstance().getReference(PrefLabelName.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			entityManagerDataSvc.getInstance().remove(prefLabelName);
 			
 		} else {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);

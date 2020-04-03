@@ -18,10 +18,10 @@ package org.toasthub.admin.preference.service;
 
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.preference.service.AppLabelSvc;
+import org.toasthub.core.preference.service.PrefOptionSvc;
 
 
-public interface AppLabelAdminSvc extends AppLabelSvc {
+public interface PrefOptionAdminSvc extends PrefOptionSvc {
 
 	public void save(RestRequest request, RestResponse response) throws Exception;
 	

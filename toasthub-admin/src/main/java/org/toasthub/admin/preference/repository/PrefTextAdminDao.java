@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.toasthub.admin.preference.service;
+package org.toasthub.admin.preference.repository;
 
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.preference.service.AppFormFieldSvc;
+import org.toasthub.core.preference.repository.PrefTextDao;
 
-
-public interface AppFormFieldAdminSvc extends AppFormFieldSvc {
+public interface PrefTextAdminDao extends PrefTextDao {
 
 	public void save(RestRequest request, RestResponse response) throws Exception;
+	public void delete(RestRequest request, RestResponse response) throws Exception;
 	
 }

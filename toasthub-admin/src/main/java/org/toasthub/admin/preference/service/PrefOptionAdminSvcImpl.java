@@ -19,25 +19,25 @@ package org.toasthub.admin.preference.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.toasthub.admin.preference.repository.AppOptionAdminDao;
+import org.toasthub.admin.preference.repository.PrefOptionAdminDao;
 import org.toasthub.core.common.UtilSvc;
 import org.toasthub.core.general.handler.ServiceProcessor;
 import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.preference.model.AppCachePageUtil;
-import org.toasthub.core.preference.model.AppPageOptionName;
-import org.toasthub.core.preference.service.AppOptionSvcImpl;
+import org.toasthub.core.preference.model.PrefCacheUtil;
+import org.toasthub.core.preference.model.PrefOptionName;
+import org.toasthub.core.preference.service.PrefOptionSvcImpl;
 
-@Service("AppOptionAdminSvc")
-public class AppOptionAdminSvcImpl extends AppOptionSvcImpl implements ServiceProcessor, AppOptionAdminSvc {
+@Service("PrefOptionAdminSvc")
+public class PrefOptionAdminSvcImpl extends PrefOptionSvcImpl implements ServiceProcessor, PrefOptionAdminSvc {
 
 	@Autowired 
-	@Qualifier("AppOptionAdminDao")
-	AppOptionAdminDao appOptionAdminDao;
+	@Qualifier("PrefOptionAdminDao")
+	PrefOptionAdminDao prefOptionAdminDao;
 	
 	@Autowired 
-	AppCachePageUtil appCachePageUtil;
+	PrefCacheUtil prefCacheUtil;
 	
 	@Autowired 
 	UtilSvc utilSvc;
@@ -46,10 +46,12 @@ public class AppOptionAdminSvcImpl extends AppOptionSvcImpl implements ServicePr
 	public void process(RestRequest request, RestResponse response) {
 		String action = (String) request.getParams().get(GlobalConstant.ACTION);
 		
-		appCachePageUtil.getPageInfo(request,response);
+		prefCacheUtil.getPrefInfo(request,response);
 		Long count = 0l;
 		switch (action) {
 		case "INIT":
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -57,12 +59,14 @@ public class AppOptionAdminSvcImpl extends AppOptionSvcImpl implements ServicePr
 			}
 			break;
 		case "LIST":
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
 				items(request, response);
 			}
-			response.addParam(GlobalConstant.PARENTID, request.getParam(GlobalConstant.PARENTID));
+			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "", response);
 			break;
 		case "SHOW":
 			this.item(request, response);
@@ -82,9 +86,9 @@ public class AppOptionAdminSvcImpl extends AppOptionSvcImpl implements ServicePr
 	//@Authorize
 	public void delete(RestRequest request, RestResponse response) {
 		try {
-			appOptionAdminDao.delete(request, response);
+			prefOptionAdminDao.delete(request, response);
 			// reset
-			appCachePageUtil.clearAppPageOptionCache();
+			prefCacheUtil.clearPrefOptionCache();
 			
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Delete Successful", response);
 		} catch (Exception e) {
@@ -106,11 +110,11 @@ public class AppOptionAdminSvcImpl extends AppOptionSvcImpl implements ServicePr
 						
 			// get existing item
 			if (request.containsParam(GlobalConstant.ITEMID) && !request.getParam(GlobalConstant.ITEMID).equals("")) {
-				appOptionAdminDao.item(request, response);
+				prefOptionAdminDao.item(request, response);
 				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
 				response.getParams().remove(GlobalConstant.ITEM);
 			} else {
-				AppPageOptionName o = new AppPageOptionName();
+				PrefOptionName o = new PrefOptionName();
 				o.setArchive(false);
 				o.setLocked(false);
 				request.addParam(GlobalConstant.ITEM, o);
@@ -119,9 +123,9 @@ public class AppOptionAdminSvcImpl extends AppOptionSvcImpl implements ServicePr
 			// marshall
 			utilSvc.marshallFields(request, response);
 									
-			appOptionAdminDao.save(request, response);
+			prefOptionAdminDao.save(request, response);
 			// reset
-			appCachePageUtil.clearAppPageOptionCache();
+			prefCacheUtil.clearPrefOptionCache();
 						
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Save Successful", response);
 		} catch (Exception e) {

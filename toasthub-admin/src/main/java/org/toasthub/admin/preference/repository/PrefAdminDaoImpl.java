@@ -21,30 +21,25 @@ import org.springframework.transaction.annotation.Transactional;
 import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.preference.model.AppPageName;
-import org.toasthub.core.preference.model.AppPageOptionName;
-import org.toasthub.core.preference.repository.AppOptionDaoImpl;
+import org.toasthub.core.preference.model.PrefName;
+import org.toasthub.core.preference.repository.PrefDaoImpl;
 
-@Repository("AppOptionAdminDao")
+@Repository("PrefAdminDao")
 @Transactional("TransactionManagerData")
-public class AppOptionAdminDaoImpl extends AppOptionDaoImpl implements AppOptionAdminDao {
-
+public class PrefAdminDaoImpl extends PrefDaoImpl implements PrefAdminDao {
+	
 	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
-		AppPageOptionName appPageOptionName = (AppPageOptionName) request.getParam(GlobalConstant.ITEM);
-		if (appPageOptionName.getPageName() == null) {
-			AppPageName appPageName = (AppPageName) entityManagerDataSvc.getInstance().getReference(AppPageName.class, new Long((Integer) request.getParam("parentId")));
-			appPageOptionName.setPageName(appPageName);
-		}
-		entityManagerDataSvc.getInstance().merge(appPageOptionName);
+		PrefName prefName = (PrefName) request.getParam(GlobalConstant.ITEM);
+		entityManagerDataSvc.getInstance().merge(prefName);
 	}
 
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
-			AppPageOptionName appPageOptionName = (AppPageOptionName) entityManagerDataSvc.getInstance().getReference(AppPageOptionName.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
-			entityManagerDataSvc.getInstance().remove(appPageOptionName);
-			
+			PrefName prefName = (PrefName) entityManagerDataSvc.getInstance().getReference(PrefName.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			entityManagerDataSvc.getInstance().remove(prefName);
+		
 		} else {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);
 		}

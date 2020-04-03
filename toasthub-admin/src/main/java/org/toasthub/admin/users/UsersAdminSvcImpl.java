@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 import org.toasthub.core.common.UtilSvc;
 import org.toasthub.core.general.handler.ServiceProcessor;
 import org.toasthub.core.general.model.GlobalConstant;
-import org.toasthub.core.preference.model.AppCachePageUtil;
+import org.toasthub.core.preference.model.PrefCacheUtil;
 import org.toasthub.security.model.User;
 import org.toasthub.security.users.UsersSvcImpl;
 import org.toasthub.core.general.model.RestRequest;
@@ -46,7 +46,7 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 	UtilSvc utilSvc;
 	
 	@Autowired 
-	AppCachePageUtil appCachePageUtil;
+	PrefCacheUtil prefCacheUtil;
 
 	public void process(RestRequest request, RestResponse response) {
 		String action = (String) request.getParams().get(GlobalConstant.ACTION);
@@ -55,8 +55,8 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 		switch (action) {
 		case "INIT":
 			this.initParams(request);
-			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			this.itemColumns(request, response);
@@ -67,8 +67,8 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 			break;
 		case "LIST":
 			this.initParams(request);
-			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			this.itemColumns(request, response);
@@ -78,19 +78,19 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
 		case "ITEM":
-			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.item(request, response);
 			break;
 		case "DELETE":
 			this.delete(request, response);
 			break;
 		case "SAVE":
-			if (!request.containsParam("appForms")) {
+			if (!request.containsParam(PrefCacheUtil.PREFFORMS)) {
 				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_USER_FORM"));
-				request.addParam("appForms", forms);
+				request.addParam(PrefCacheUtil.PREFFORMS, forms);
 			}
-			appCachePageUtil.getPageInfo(request,response);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.save(request, response);
 			break;
 		case "SAVE_ROLE":

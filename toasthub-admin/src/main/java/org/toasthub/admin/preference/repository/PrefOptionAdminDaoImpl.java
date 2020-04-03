@@ -18,37 +18,35 @@ package org.toasthub.admin.preference.repository;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
 import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.preference.model.AppPageName;
-import org.toasthub.core.preference.model.AppPageTextName;
-import org.toasthub.core.preference.repository.AppTextDaoImpl;
+import org.toasthub.core.preference.model.PrefName;
+import org.toasthub.core.preference.model.PrefOptionName;
+import org.toasthub.core.preference.repository.PrefOptionDaoImpl;
 
-@Repository("AppTextAdminDao")
+@Repository("PrefOptionAdminDao")
 @Transactional("TransactionManagerData")
-public class AppTextAdminDaoImpl extends AppTextDaoImpl implements AppTextAdminDao {
+public class PrefOptionAdminDaoImpl extends PrefOptionDaoImpl implements PrefOptionAdminDao {
 
 	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
-		AppPageTextName appPageTextName = (AppPageTextName) request.getParam(GlobalConstant.ITEM);
-		if (appPageTextName.getPageName() == null) {
-			AppPageName appPageName = (AppPageName) entityManagerDataSvc.getInstance().getReference(AppPageName.class, new Long((Integer) request.getParam("parentId")));
-			appPageTextName.setPageName(appPageName);
+		PrefOptionName prefOptionName = (PrefOptionName) request.getParam(GlobalConstant.ITEM);
+		if (prefOptionName.getPrefName() == null) {
+			PrefName prefName = (PrefName) entityManagerDataSvc.getInstance().getReference(PrefName.class, new Long((Integer) request.getParam("parentId")));
+			prefOptionName.setPrefName(prefName);
 		}
-		entityManagerDataSvc.getInstance().merge(appPageTextName);
+		entityManagerDataSvc.getInstance().merge(prefOptionName);
 	}
 
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
-			AppPageTextName appPageTextName = (AppPageTextName) entityManagerDataSvc.getInstance().getReference(AppPageTextName.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
-			entityManagerDataSvc.getInstance().remove(appPageTextName);
+			PrefOptionName prefOptionName = (PrefOptionName) entityManagerDataSvc.getInstance().getReference(PrefOptionName.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			entityManagerDataSvc.getInstance().remove(prefOptionName);
 			
 		} else {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);
 		}
-		
 	}
 }

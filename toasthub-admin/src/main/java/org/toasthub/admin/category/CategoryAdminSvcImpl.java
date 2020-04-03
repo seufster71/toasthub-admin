@@ -25,7 +25,7 @@ import org.toasthub.core.general.handler.ServiceProcessor;
 import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.preference.model.AppCachePageUtil;
+import org.toasthub.core.preference.model.PrefCacheUtil;
 
 @Service("CategoryAdminSvc")
 public class CategoryAdminSvcImpl extends CategorySvcImpl implements ServiceProcessor, CategoryAdminSvc {
@@ -35,7 +35,7 @@ public class CategoryAdminSvcImpl extends CategorySvcImpl implements ServiceProc
 	CategoryAdminDao categoryAdminDao;
 	
 	@Autowired 
-	AppCachePageUtil appCachePageUtil;
+	PrefCacheUtil prefCacheUtil;
 	
 	@Autowired 
 	UtilSvc utilSvc;
@@ -47,8 +47,8 @@ public class CategoryAdminSvcImpl extends CategorySvcImpl implements ServiceProc
 		Long count = 0l;
 		switch (action) {
 		case "INIT":
-			request.addParam("appPageParamLoc", "response");
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -56,8 +56,8 @@ public class CategoryAdminSvcImpl extends CategorySvcImpl implements ServiceProc
 			}
 			break;
 		case "LIST":
-			request.addParam("appPageParamLoc", "response");
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			itemCount(request, response);
 			count = (Long) response.getParam("count");
 			if (count != null && count > 0){

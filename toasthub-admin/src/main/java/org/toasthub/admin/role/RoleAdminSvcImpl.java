@@ -32,7 +32,7 @@ import org.toasthub.core.general.handler.ServiceProcessor;
 import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.preference.model.AppCachePageUtil;
+import org.toasthub.core.preference.model.PrefCacheUtil;
 import org.toasthub.security.application.ApplicationSvc;
 import org.toasthub.security.model.Role;
 import org.toasthub.security.model.UserRole;
@@ -46,7 +46,7 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 	RoleAdminDao roleAdminDao;
 	
 	@Autowired 
-	AppCachePageUtil appCachePageUtil;
+	PrefCacheUtil prefCacheUtil;
 	
 	@Autowired 
 	UtilSvc utilSvc;
@@ -61,8 +61,8 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 		Long count = 0l;
 		switch (action) {
 		case "INIT":
-			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -83,8 +83,8 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 			}
 			break;
 		case "LIST":
-			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -105,8 +105,8 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 			}
 			break;
 		case "ITEM":
-			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.item(request, response);
 			applicationSvc.selectList(request, response);
 			// add Select... for first element
@@ -120,29 +120,29 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 			this.delete(request, response);
 			break;
 		case "SAVE":
-			if (!request.containsParam("appForms")) {
+			if (!request.containsParam(PrefCacheUtil.PREFFORMS)) {
 				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_ROLE_FORM"));
-				request.addParam("appForms", forms);
+				request.addParam(PrefCacheUtil.PREFFORMS, forms);
 			}
-			request.addParam("appGlobal", global);
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFGLOBAL, global);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.save(request, response);
 			break;
 		case "USER_ROLE_ITEM":
-			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.userRole(request, response);
 			if (request.containsParam("roleId")) {
 				response.addParam("roleId", request.getParam("roleId"));
 			}
 			break;	
 		case "USER_ROLE_SAVE":
-			if (!request.containsParam("appForms")) {
+			if (!request.containsParam(PrefCacheUtil.PREFFORMS)) {
 				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_USER_ROLE_FORM"));
-				request.addParam("appForms", forms);
+				request.addParam(PrefCacheUtil.PREFFORMS, forms);
 			}
-			request.addParam("appGlobal", global);
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFGLOBAL, global);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.userRoleSave(request, response);
 			break;
 		default:
@@ -176,7 +176,7 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 				return;
 			}
 			// get existing item
-			Map<String,Object> inputList = (Map<String, Object>) request.getParam("inputFields");
+			Map<String,Object> inputList = (Map<String, Object>) request.getParam(GlobalConstant.INPUTFIELDS);
 			if (inputList.containsKey(GlobalConstant.ITEMID) && inputList.get(GlobalConstant.ITEMID) != null && !"".equals(inputList.get(GlobalConstant.ITEMID))) {
 				request.addParam(GlobalConstant.ITEMID, inputList.get(GlobalConstant.ITEMID));
 				roleAdminDao.item(request, response);
@@ -231,7 +231,7 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 				return;
 			}
 			// get existing item
-			Map<String,Object> inputList = (Map<String, Object>) request.getParam("inputFields");
+			Map<String,Object> inputList = (Map<String, Object>) request.getParam(GlobalConstant.INPUTFIELDS);
 			if (inputList.containsKey(GlobalConstant.ITEMID) && inputList.get(GlobalConstant.ITEMID) != null && !"".equals(inputList.get(GlobalConstant.ITEMID))) {
 				request.addParam(GlobalConstant.ITEMID, inputList.get(GlobalConstant.ITEMID));
 				roleAdminDao.userRole(request, response);

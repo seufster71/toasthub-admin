@@ -18,9 +18,9 @@ package org.toasthub.admin.preference.repository;
 
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.preference.repository.AppLabelDao;
+import org.toasthub.core.preference.repository.PrefOptionDao;
 
-public interface AppLabelAdminDao extends AppLabelDao {
+public interface PrefOptionAdminDao extends PrefOptionDao {
 
 	public void save(RestRequest request, RestResponse response) throws Exception;
 	public void delete(RestRequest request, RestResponse response) throws Exception;

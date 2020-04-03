@@ -32,7 +32,7 @@ import org.toasthub.core.general.handler.ServiceProcessor;
 import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.preference.model.AppCachePageUtil;
+import org.toasthub.core.preference.model.PrefCacheUtil;
 import org.toasthub.security.application.ApplicationSvc;
 import org.toasthub.security.model.Permission;
 import org.toasthub.security.model.RolePermission;
@@ -46,7 +46,7 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 	PermissionAdminDao permissionAdminDao;
 	
 	@Autowired 
-	AppCachePageUtil appCachePageUtil;
+	PrefCacheUtil prefCacheUtil;
 	
 	@Autowired 
 	UtilSvc utilSvc;
@@ -61,8 +61,8 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 		Long count = 0l;
 		switch (action) {
 		case "INIT":
-			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -85,8 +85,8 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
 		case "LIST":
-			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -109,8 +109,8 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
 		case "ITEM":
-			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.item(request, response);
 			applicationSvc.selectList(request, response);
 			// add Select... for first element
@@ -124,29 +124,29 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 			this.delete(request, response);
 			break;
 		case "SAVE":
-			if (!request.containsParam("appForms")) {
+			if (!request.containsParam(PrefCacheUtil.PREFFORMS)) {
 				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_PERMISSION_FORM"));
-				request.addParam("appForms", forms);
+				request.addParam(PrefCacheUtil.PREFFORMS, forms);
 			}
-			request.addParam("appGlobal", global);
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFGLOBAL, global);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.save(request, response);
 			break;
 		case "ROLE_PERMISSION_ITEM":
-			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.rolePermission(request, response);
 			if (request.containsParam("permissionId")) {
 				response.addParam("permissionId", request.getParam("permissionId"));
 			}
 			break;	
 		case "ROLE_PERMISSION_SAVE":
-			if (!request.containsParam("appForms")) {
+			if (!request.containsParam(PrefCacheUtil.PREFFORMS)) {
 				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_ROLE_PERMISSION_FORM"));
-				request.addParam("appForms", forms);
+				request.addParam(PrefCacheUtil.PREFFORMS, forms);
 			}
-			request.addParam("appGlobal", global);
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFGLOBAL, global);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.rolePermissionSave(request, response);
 			break;
 		default:

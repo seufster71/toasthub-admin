@@ -31,7 +31,7 @@ import org.toasthub.core.general.model.Language;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.language.LanguageSvcImpl;
-import org.toasthub.core.preference.model.AppCachePageUtil;
+import org.toasthub.core.preference.model.PrefCacheUtil;
 
 @Service("LanguageAdminSvc")
 public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProcessor, LanguageAdminSvc {
@@ -41,7 +41,7 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 	LanguageAdminDao languageAdminDao;
 	
 	@Autowired 
-	AppCachePageUtil appCachePageUtil;
+	PrefCacheUtil prefCacheUtil;
 	
 	@Autowired 
 	UtilSvc utilSvc;
@@ -54,8 +54,8 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 		Long count = 0l;
 		switch (action) {
 		case "INIT":
-			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			this.itemColumns(request, response);
@@ -65,8 +65,8 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
 		case "LIST":
-			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			this.itemColumns(request, response);
@@ -76,20 +76,20 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 			response.addParam(GlobalConstant.ITEMNAME, request.getParam(GlobalConstant.ITEMNAME));
 			break;
 		case "ITEM":
-			request.addParam(AppCachePageUtil.APPPAGEPARAMLOC, AppCachePageUtil.RESPONSE);
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.item(request, response);
 			break;
 		case "DELETE":
 			this.delete(request, response);
 			break;
 		case "SAVE":
-			if (!request.containsParam("appForms")) {
+			if (!request.containsParam(PrefCacheUtil.PREFFORMS)) {
 				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_LANGUAGE_FORM"));
-				request.addParam("appForms", forms);
+				request.addParam(PrefCacheUtil.PREFFORMS, forms);
 			}
-			request.addParam("appGlobal", global);
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFGLOBAL, global);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.save(request, response);
 			break;
 		default:
@@ -103,7 +103,7 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 		try {
 			languageAdminDao.delete(request, response);
 			// reset cache
-			appCachePageUtil.clearLanguageCache();
+			prefCacheUtil.clearLanguageCache();
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Delete Successful", response);
 		} catch (Exception e) {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Delete Failed", response);
@@ -122,7 +122,7 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 				return;
 			}
 			// get existing item
-			Map<String,Object> inputList = (Map<String, Object>) request.getParam("inputFields");
+			Map<String,Object> inputList = (Map<String, Object>) request.getParam(GlobalConstant.INPUTFIELDS);
 			if (inputList.containsKey(GlobalConstant.ITEMID) && inputList.get(GlobalConstant.ITEMID) != null && !"".equals(inputList.get(GlobalConstant.ITEMID))) {
 				request.addParam(GlobalConstant.ITEMID, inputList.get(GlobalConstant.ITEMID));
 				languageAdminDao.item(request, response);
@@ -163,7 +163,7 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 			languageAdminDao.save(request, response);
 
 			// reset cache
-			appCachePageUtil.clearLanguageCache();
+			prefCacheUtil.clearLanguageCache();
 			
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Save Successful", response);
 		} catch (Exception e) {

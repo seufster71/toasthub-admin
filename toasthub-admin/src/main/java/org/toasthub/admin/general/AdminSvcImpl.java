@@ -33,7 +33,7 @@ import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.MenuItem;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.preference.model.AppCachePageUtil;
+import org.toasthub.core.preference.model.PrefCacheUtil;
 import org.toasthub.security.model.User;
 import org.toasthub.security.model.UserContext;
 
@@ -56,7 +56,7 @@ public class AdminSvcImpl implements ServiceProcessor, AdminSvc {
 	MenuAdminSvc menuAdminSvc;
 	
 	@Autowired
-	AppCachePageUtil appCachePageUtil;
+	PrefCacheUtil prefCacheUtil;
 	
 	@Autowired 
 	UserContext userContext;
@@ -79,8 +79,8 @@ public class AdminSvcImpl implements ServiceProcessor, AdminSvc {
 		
 		switch (action) {
 		case "INIT":
-			request.addParam("appPageParamLoc", "response");
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			
 			// get menus
 			if (request.containsParam(GlobalConstant.MENUNAMES)){

@@ -19,25 +19,25 @@ package org.toasthub.admin.preference.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.toasthub.admin.preference.repository.AppLabelAdminDao;
+import org.toasthub.admin.preference.repository.PrefFormFieldAdminDao;
 import org.toasthub.core.common.UtilSvc;
 import org.toasthub.core.general.handler.ServiceProcessor;
 import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.preference.model.AppCachePageUtil;
-import org.toasthub.core.preference.model.AppPageLabelName;
-import org.toasthub.core.preference.service.AppLabelSvcImpl;
+import org.toasthub.core.preference.model.PrefCacheUtil;
+import org.toasthub.core.preference.model.PrefFormFieldName;
+import org.toasthub.core.preference.service.PrefFormFieldSvcImpl;
 
-@Service("AppLabelAdminSvc")
-public class AppLabelAdminSvcImpl extends AppLabelSvcImpl implements ServiceProcessor, AppLabelAdminSvc {
+@Service("PrefFormFieldAdminSvc")
+public class PrefFormFieldAdminSvcImpl extends PrefFormFieldSvcImpl implements ServiceProcessor, PrefFormFieldAdminSvc {
 
 	@Autowired 
-	@Qualifier("AppLabelAdminDao")
-	AppLabelAdminDao appLabelAdminDao;
+	@Qualifier("PrefFormFieldAdminDao")
+	PrefFormFieldAdminDao prefFormFieldAdminDao;
 	
-	@Autowired
-	AppCachePageUtil appCachePageUtil;
+	@Autowired 
+	PrefCacheUtil prefCacheUtil;
 	
 	@Autowired 
 	UtilSvc utilSvc;
@@ -46,23 +46,27 @@ public class AppLabelAdminSvcImpl extends AppLabelSvcImpl implements ServiceProc
 	public void process(RestRequest request, RestResponse response) {
 		String action = (String) request.getParams().get(GlobalConstant.ACTION);
 		
-		appCachePageUtil.getPageInfo(request,response);
+		prefCacheUtil.getPrefInfo(request,response);
 		Long count = 0l;
 		switch (action) {
 		case "INIT":
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
 				items(request, response);
 			}
 			break;
-		case "LIST":
+		case "LIST":	
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
 				items(request, response);
 			}
-			response.addParam(GlobalConstant.PARENTID, request.getParam(GlobalConstant.PARENTID));
+			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "", response);
 			break;
 		case "SHOW":
 			this.item(request, response);
@@ -79,12 +83,16 @@ public class AppLabelAdminSvcImpl extends AppLabelSvcImpl implements ServiceProc
 		}
 	}
 	
+	protected void initParams(RestRequest request) {
+		
+	}
+	
 	//@Authorize
 	public void delete(RestRequest request, RestResponse response) {
 		try {
-			appLabelAdminDao.delete(request, response);
-			// reset
-			appCachePageUtil.clearAppPageLabelCache();
+			prefFormFieldAdminDao.delete(request, response);
+			// reset cache
+			prefCacheUtil.clearPrefFormFieldCache();
 			
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Delete Successful", response);
 		} catch (Exception e) {
@@ -98,30 +106,30 @@ public class AppLabelAdminSvcImpl extends AppLabelSvcImpl implements ServiceProc
 		try {
 			// validate
 			utilSvc.validateParams(request, response);
-									
+						
 			if ((Boolean) request.getParam(GlobalConstant.VALID) == false) {
 				utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Validation Error", response);
 				return;
 			}
-						
+			
 			// get existing item
 			if (request.containsParam(GlobalConstant.ITEMID) && !request.getParam(GlobalConstant.ITEMID).equals("")) {
-				appLabelAdminDao.item(request, response);
+				prefFormFieldAdminDao.item(request, response);
 				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
 				response.getParams().remove(GlobalConstant.ITEM);
 			} else {
-				AppPageLabelName l = new AppPageLabelName();
-				l.setArchive(false);
-				l.setLocked(false);
-				request.addParam(GlobalConstant.ITEM, l);
+				PrefFormFieldName ff = new PrefFormFieldName();
+				ff.setArchive(false);
+				ff.setLocked(false);
+				request.addParam(GlobalConstant.ITEM, ff);
 			}
-						
+			
 			// marshall
 			utilSvc.marshallFields(request, response);
-									
-			appLabelAdminDao.save(request, response);
-			// reset
-			appCachePageUtil.clearAppPageLabelCache();
+			
+			prefFormFieldAdminDao.save(request, response);
+			// reset cache
+			prefCacheUtil.clearPrefFormFieldCache();
 			
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Save Successful", response);
 		} catch (Exception e) {

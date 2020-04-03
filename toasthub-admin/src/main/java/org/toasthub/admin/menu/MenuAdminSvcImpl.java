@@ -30,6 +30,7 @@ import org.toasthub.core.general.model.MenuItem;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.menu.MenuSvcImpl;
+import org.toasthub.core.preference.model.PrefCacheUtil;
 
 @Service("MenuAdminSvc")
 public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, MenuAdminSvc {
@@ -41,6 +42,9 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 	@Autowired 
 	AppCacheMenuUtil appCacheMenuUtil;
 	
+	@Autowired 
+	PrefCacheUtil prefCacheUtil;
+	
 	// Processor
 	@Override
 	public void process(RestRequest request, RestResponse response) {
@@ -49,8 +53,8 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 		Long count = 0l;
 		switch (action) {
 		case "INIT": 
-			request.addParam("appPageParamLoc", "response");
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			//appCachePage.getGlobalInfo(request,response);
 			
 			this.initParams(request);
@@ -64,8 +68,8 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 			
 			break;
 		case "LIST":
-			request.addParam("appPageParamLoc", "response");
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			
 			this.initParams(request);
 			this.itemColumns(request, response);
@@ -104,7 +108,7 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 			this.delete(request, response);
 			break;
 		case "SAVE":
-			appCachePageUtil.getPageInfo(request,response);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.save(request, response);
 			break;
 		default:
@@ -135,8 +139,8 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 		try {
 			if ( !request.containsParam(GlobalConstant.ITEMTYPE) ){
 				request.addParam(GlobalConstant.ITEMTYPE, "menu");
-				if (!request.containsParam("appForms")) {
-					request.addParam("appForms", new ArrayList<String>(Arrays.asList("APP_MENU_FORM")));
+				if (!request.containsParam(PrefCacheUtil.PREFFORMS)) {
+					request.addParam(PrefCacheUtil.PREFFORMS, new ArrayList<String>(Arrays.asList("APP_MENU_FORM")));
 				}
 			}
 			

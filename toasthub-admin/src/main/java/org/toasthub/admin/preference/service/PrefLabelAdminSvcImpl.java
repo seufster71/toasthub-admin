@@ -19,38 +19,39 @@ package org.toasthub.admin.preference.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.toasthub.admin.preference.repository.AppPageAdminDao;
+import org.toasthub.admin.preference.repository.PrefLabelAdminDao;
 import org.toasthub.core.common.UtilSvc;
 import org.toasthub.core.general.handler.ServiceProcessor;
 import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.preference.model.AppCachePageUtil;
-import org.toasthub.core.preference.model.AppPageName;
-import org.toasthub.core.preference.service.AppPageSvcImpl;
+import org.toasthub.core.preference.model.PrefCacheUtil;
+import org.toasthub.core.preference.model.PrefLabelName;
+import org.toasthub.core.preference.service.PrefLabelSvcImpl;
 
-@Service("AppPageAdminSvc")
-public class AppPageAdminSvcImpl extends AppPageSvcImpl implements ServiceProcessor, AppPageAdminSvc {
+@Service("PrefLabelAdminSvc")
+public class PrefLabelAdminSvcImpl extends PrefLabelSvcImpl implements ServiceProcessor, PrefLabelAdminSvc {
 
 	@Autowired 
-	@Qualifier("AppPageAdminDao")
-	AppPageAdminDao appPageAdminDao;
+	@Qualifier("PrefLabelAdminDao")
+	PrefLabelAdminDao prefLabelAdminDao;
 	
-	@Autowired 
-	AppCachePageUtil appCachePageUtil;
+	@Autowired
+	PrefCacheUtil prefCacheUtil;
 	
 	@Autowired 
 	UtilSvc utilSvc;
 	
-
+	@Override
 	public void process(RestRequest request, RestResponse response) {
 		String action = (String) request.getParams().get(GlobalConstant.ACTION);
 		
+		prefCacheUtil.getPrefInfo(request,response);
 		Long count = 0l;
 		switch (action) {
 		case "INIT":
-			request.addParam("appPageParamLoc", "response");
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -58,11 +59,14 @@ public class AppPageAdminSvcImpl extends AppPageSvcImpl implements ServiceProces
 			}
 			break;
 		case "LIST":
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
 				items(request, response);
 			}
+			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "", response);
 			break;
 		case "SHOW":
 			this.item(request, response);
@@ -71,64 +75,61 @@ public class AppPageAdminSvcImpl extends AppPageSvcImpl implements ServiceProces
 			this.delete(request, response);
 			break;
 		case "SAVE":
-			appCachePageUtil.getPageInfo(request,response);
 			this.save(request, response);
 			break;
 		default:
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.ACTIONNOTEXIST, "Action not available", response);
 			break;
 		}
-		
 	}
 	
+	//@Authorize
+	public void delete(RestRequest request, RestResponse response) {
+		try {
+			prefLabelAdminDao.delete(request, response);
+			// reset
+			prefCacheUtil.clearPrefLabelCache();
+			
+			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Delete Successful", response);
+		} catch (Exception e) {
+			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Delete Failed", response);
+			e.printStackTrace();
+		}
+	}
 	
 	//@Authorize
 	public void save(RestRequest request, RestResponse response) {
 		try {
 			// validate
 			utilSvc.validateParams(request, response);
-			
+									
 			if ((Boolean) request.getParam(GlobalConstant.VALID) == false) {
 				utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Validation Error", response);
 				return;
 			}
-			
+						
 			// get existing item
 			if (request.containsParam(GlobalConstant.ITEMID) && !request.getParam(GlobalConstant.ITEMID).equals("")) {
-				appPageAdminDao.item(request, response);
+				prefLabelAdminDao.item(request, response);
 				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
 				response.getParams().remove(GlobalConstant.ITEM);
 			} else {
-				AppPageName p = new AppPageName();
-				p.setArchive(false);
-				p.setLocked(false);
-				request.addParam(GlobalConstant.ITEM, p);
+				PrefLabelName l = new PrefLabelName();
+				l.setArchive(false);
+				l.setLocked(false);
+				request.addParam(GlobalConstant.ITEM, l);
 			}
-			
+						
 			// marshall
 			utilSvc.marshallFields(request, response);
-						
-			appPageAdminDao.save(request, response);
+									
+			prefLabelAdminDao.save(request, response);
+			// reset
+			prefCacheUtil.clearPrefLabelCache();
 			
-			// no need to clear cache here need to make sub items first
-					
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Save Successful", response);
 		} catch (Exception e) {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Save Failed", response);
-			e.printStackTrace();
-		}
-	}
-	
-	//@Authorize
-	public void delete(RestRequest request, RestResponse response) {
-		try {
-			appPageAdminDao.delete(request, response);
-			// need to clear all caches
-			appCachePageUtil.clearAppCache();
-			
-			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Delete Successful", response);
-		} catch (Exception e) {
-			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Delete Failed", response);
 			e.printStackTrace();
 		}
 	}

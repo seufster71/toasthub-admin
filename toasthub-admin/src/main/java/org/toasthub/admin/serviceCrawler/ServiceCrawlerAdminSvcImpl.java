@@ -23,7 +23,7 @@ import org.toasthub.core.general.handler.ServiceProcessor;
 import org.toasthub.core.general.model.GlobalConstant;
 import org.toasthub.core.general.model.ServiceClass;
 import org.toasthub.core.general.model.AppCacheServiceCrawler;
-import org.toasthub.core.preference.model.AppCachePageUtil;
+import org.toasthub.core.preference.model.PrefCacheUtil;
 import org.toasthub.core.serviceCrawler.ServiceCrawlerSvcImpl;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
@@ -36,7 +36,7 @@ public class ServiceCrawlerAdminSvcImpl extends ServiceCrawlerSvcImpl implements
 	ServiceCrawlerAdminDao serviceCrawlerAdminDao;
 	
 	@Autowired 
-	AppCachePageUtil appCachePageUtil;
+	PrefCacheUtil prefCacheUtil;
 	
 	@Autowired 
 	AppCacheServiceCrawler serviceCrawler;
@@ -49,8 +49,8 @@ public class ServiceCrawlerAdminSvcImpl extends ServiceCrawlerSvcImpl implements
 		switch (action) {
 		case "INIT":
 			this.initParams(request);
-			request.addParam("appPageParamLoc", "response");
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -59,8 +59,8 @@ public class ServiceCrawlerAdminSvcImpl extends ServiceCrawlerSvcImpl implements
 			break;
 		case "LIST":
 			this.initParams(request);
-			request.addParam("appPageParamLoc", "response");
-			appCachePageUtil.getPageInfo(request,response);
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
@@ -74,7 +74,7 @@ public class ServiceCrawlerAdminSvcImpl extends ServiceCrawlerSvcImpl implements
 			this.delete(request, response);
 			break;
 		case "SAVE":
-			appCachePageUtil.getPageInfo(request,response);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.save(request, response);
 			break;
 		default:

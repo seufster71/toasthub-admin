@@ -18,9 +18,9 @@ package org.toasthub.admin.preference.service;
 
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
-import org.toasthub.core.preference.service.AppPageSvc;
+import org.toasthub.core.preference.service.PrefSvc;
 
-public interface AppPageAdminSvc extends AppPageSvc {
+public interface PrefAdminSvc extends PrefSvc {
 
 	public void save(RestRequest request, RestResponse response) throws Exception;
 	
