@@ -46,7 +46,6 @@ public class PrefLabelAdminSvcImpl extends PrefLabelSvcImpl implements ServicePr
 	public void process(RestRequest request, RestResponse response) {
 		String action = (String) request.getParams().get(GlobalConstant.ACTION);
 		
-		prefCacheUtil.getPrefInfo(request,response);
 		Long count = 0l;
 		switch (action) {
 		case "INIT":

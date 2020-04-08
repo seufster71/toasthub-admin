@@ -45,8 +45,7 @@ public class PrefFormFieldAdminSvcImpl extends PrefFormFieldSvcImpl implements S
 	@Override
 	public void process(RestRequest request, RestResponse response) {
 		String action = (String) request.getParams().get(GlobalConstant.ACTION);
-		
-		prefCacheUtil.getPrefInfo(request,response);
+	
 		Long count = 0l;
 		switch (action) {
 		case "INIT":
@@ -68,7 +67,9 @@ public class PrefFormFieldAdminSvcImpl extends PrefFormFieldSvcImpl implements S
 			}
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "", response);
 			break;
-		case "SHOW":
+		case "ITEM":
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.item(request, response);
 			break;
 		case "DELETE":

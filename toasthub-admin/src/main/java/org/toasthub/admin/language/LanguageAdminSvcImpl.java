@@ -85,7 +85,7 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 			break;
 		case "SAVE":
 			if (!request.containsParam(PrefCacheUtil.PREFFORMS)) {
-				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_LANGUAGE_FORM"));
+				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_LANGUAGE_PAGE"));
 				request.addParam(PrefCacheUtil.PREFFORMS, forms);
 			}
 			request.addParam(PrefCacheUtil.PREFGLOBAL, global);

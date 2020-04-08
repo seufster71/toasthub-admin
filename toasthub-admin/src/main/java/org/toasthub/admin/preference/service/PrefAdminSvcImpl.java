@@ -16,6 +16,11 @@
 
 package org.toasthub.admin.preference.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -45,6 +50,7 @@ public class PrefAdminSvcImpl extends PrefSvcImpl implements ServiceProcessor, P
 
 	public void process(RestRequest request, RestResponse response) {
 		String action = (String) request.getParams().get(GlobalConstant.ACTION);
+		List<String> global =  new ArrayList<String>(Arrays.asList("LANGUAGES"));
 		
 		Long count = 0l;
 		switch (action) {
@@ -57,13 +63,20 @@ public class PrefAdminSvcImpl extends PrefSvcImpl implements ServiceProcessor, P
 				items(request, response);
 			}
 			break;
-		case "SHOW":
+		case "ITEM":
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.item(request, response);
 			break;
 		case "DELETE":
 			this.delete(request, response);
 			break;
 		case "SAVE":
+			if (!request.containsParam(PrefCacheUtil.PREFFORMS)) {
+				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_PREFERENCE_PAGE"));
+				request.addParam(PrefCacheUtil.PREFFORMS, forms);
+			}
+			request.addParam(PrefCacheUtil.PREFGLOBAL, global);
 			prefCacheUtil.getPrefInfo(request,response);
 			this.save(request, response);
 			break;
@@ -87,7 +100,9 @@ public class PrefAdminSvcImpl extends PrefSvcImpl implements ServiceProcessor, P
 			}
 			
 			// get existing item
-			if (request.containsParam(GlobalConstant.ITEMID) && !request.getParam(GlobalConstant.ITEMID).equals("")) {
+			Map<String,Object> inputList = (Map<String, Object>) request.getParam(GlobalConstant.INPUTFIELDS);
+			if (inputList.get(GlobalConstant.ITEMID) != null && !"".equals(inputList.get(GlobalConstant.ITEMID))) {
+				request.addParam(GlobalConstant.ITEMID, inputList.get(GlobalConstant.ITEMID));
 				prefAdminDao.item(request, response);
 				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
 				response.getParams().remove(GlobalConstant.ITEM);
@@ -103,7 +118,7 @@ public class PrefAdminSvcImpl extends PrefSvcImpl implements ServiceProcessor, P
 						
 			prefAdminDao.save(request, response);
 			
-			// no need to clear cache here need to make sub items first
+			prefCacheUtil.clearPrefCache();
 					
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Save Successful", response);
 		} catch (Exception e) {
