@@ -16,6 +16,11 @@
 
 package org.toasthub.admin.preference.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -45,18 +50,10 @@ public class PrefOptionAdminSvcImpl extends PrefOptionSvcImpl implements Service
 	@Override
 	public void process(RestRequest request, RestResponse response) {
 		String action = (String) request.getParams().get(GlobalConstant.ACTION);
+		List<String> global =  new ArrayList<String>(Arrays.asList("LANGUAGES"));
 		
 		Long count = 0l;
 		switch (action) {
-		case "INIT":
-			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
-			prefCacheUtil.getPrefInfo(request,response);
-			itemCount(request, response);
-			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
-			if (count != null && count > 0){
-				items(request, response);
-			}
-			break;
 		case "LIST":
 			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
 			prefCacheUtil.getPrefInfo(request,response);
@@ -65,15 +62,22 @@ public class PrefOptionAdminSvcImpl extends PrefOptionSvcImpl implements Service
 			if (count != null && count > 0){
 				items(request, response);
 			}
-			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "", response);
 			break;
-		case "SHOW":
+		case "ITEM":
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.item(request, response);
 			break;
 		case "DELETE":
 			this.delete(request, response);
 			break;
 		case "SAVE":
+			if (!request.containsParam(PrefCacheUtil.PREFFORMKEYS)) {
+				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_OPTION_PAGE"));
+				request.addParam(PrefCacheUtil.PREFFORMKEYS, forms);
+			}
+			request.addParam(PrefCacheUtil.PREFGLOBAL, global);
+			prefCacheUtil.getPrefInfo(request,response);
 			this.save(request, response);
 			break;
 		default:
@@ -108,7 +112,9 @@ public class PrefOptionAdminSvcImpl extends PrefOptionSvcImpl implements Service
 			}
 						
 			// get existing item
-			if (request.containsParam(GlobalConstant.ITEMID) && !request.getParam(GlobalConstant.ITEMID).equals("")) {
+			Map<String,Object> inputList = (Map<String, Object>) request.getParam(GlobalConstant.INPUTFIELDS);
+			if (inputList.containsKey(GlobalConstant.ITEMID) && inputList.get(GlobalConstant.ITEMID) != null && !"".equals(inputList.get(GlobalConstant.ITEMID))) {
+				request.addParam(GlobalConstant.ITEMID, inputList.get(GlobalConstant.ITEMID));
 				prefOptionAdminDao.item(request, response);
 				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
 				response.getParams().remove(GlobalConstant.ITEM);

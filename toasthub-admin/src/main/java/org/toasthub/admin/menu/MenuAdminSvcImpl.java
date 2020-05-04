@@ -139,8 +139,8 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 		try {
 			if ( !request.containsParam(GlobalConstant.ITEMTYPE) ){
 				request.addParam(GlobalConstant.ITEMTYPE, "menu");
-				if (!request.containsParam(PrefCacheUtil.PREFFORMS)) {
-					request.addParam(PrefCacheUtil.PREFFORMS, new ArrayList<String>(Arrays.asList("APP_MENU_FORM")));
+				if (!request.containsParam(PrefCacheUtil.PREFFORMKEYS)) {
+					request.addParam(PrefCacheUtil.PREFFORMKEYS, new ArrayList<String>(Arrays.asList("APP_MENU_FORM")));
 				}
 			}
 			

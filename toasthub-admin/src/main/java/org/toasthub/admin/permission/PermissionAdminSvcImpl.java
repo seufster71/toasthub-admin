@@ -124,9 +124,9 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 			this.delete(request, response);
 			break;
 		case "SAVE":
-			if (!request.containsParam(PrefCacheUtil.PREFFORMS)) {
+			if (!request.containsParam(PrefCacheUtil.PREFFORMKEYS)) {
 				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_PERMISSION_FORM"));
-				request.addParam(PrefCacheUtil.PREFFORMS, forms);
+				request.addParam(PrefCacheUtil.PREFFORMKEYS, forms);
 			}
 			request.addParam(PrefCacheUtil.PREFGLOBAL, global);
 			prefCacheUtil.getPrefInfo(request,response);
@@ -141,9 +141,9 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 			}
 			break;	
 		case "ROLE_PERMISSION_SAVE":
-			if (!request.containsParam(PrefCacheUtil.PREFFORMS)) {
+			if (!request.containsParam(PrefCacheUtil.PREFFORMKEYS)) {
 				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_ROLE_PERMISSION_FORM"));
-				request.addParam(PrefCacheUtil.PREFFORMS, forms);
+				request.addParam(PrefCacheUtil.PREFFORMKEYS, forms);
 			}
 			request.addParam(PrefCacheUtil.PREFGLOBAL, global);
 			prefCacheUtil.getPrefInfo(request,response);

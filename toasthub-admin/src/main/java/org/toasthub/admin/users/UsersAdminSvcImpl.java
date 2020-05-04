@@ -86,9 +86,9 @@ public class UsersAdminSvcImpl extends UsersSvcImpl implements ServiceProcessor,
 			this.delete(request, response);
 			break;
 		case "SAVE":
-			if (!request.containsParam(PrefCacheUtil.PREFFORMS)) {
+			if (!request.containsParam(PrefCacheUtil.PREFFORMKEYS)) {
 				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_USER_FORM"));
-				request.addParam(PrefCacheUtil.PREFFORMS, forms);
+				request.addParam(PrefCacheUtil.PREFFORMKEYS, forms);
 			}
 			prefCacheUtil.getPrefInfo(request,response);
 			this.save(request, response);

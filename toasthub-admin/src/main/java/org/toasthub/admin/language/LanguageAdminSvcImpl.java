@@ -84,9 +84,9 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 			this.delete(request, response);
 			break;
 		case "SAVE":
-			if (!request.containsParam(PrefCacheUtil.PREFFORMS)) {
+			if (!request.containsParam(PrefCacheUtil.PREFFORMKEYS)) {
 				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_LANGUAGE_PAGE"));
-				request.addParam(PrefCacheUtil.PREFFORMS, forms);
+				request.addParam(PrefCacheUtil.PREFFORMKEYS, forms);
 			}
 			request.addParam(PrefCacheUtil.PREFGLOBAL, global);
 			prefCacheUtil.getPrefInfo(request,response);

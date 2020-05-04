@@ -120,9 +120,9 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 			this.delete(request, response);
 			break;
 		case "SAVE":
-			if (!request.containsParam(PrefCacheUtil.PREFFORMS)) {
+			if (!request.containsParam(PrefCacheUtil.PREFFORMKEYS)) {
 				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_ROLE_FORM"));
-				request.addParam(PrefCacheUtil.PREFFORMS, forms);
+				request.addParam(PrefCacheUtil.PREFFORMKEYS, forms);
 			}
 			request.addParam(PrefCacheUtil.PREFGLOBAL, global);
 			prefCacheUtil.getPrefInfo(request,response);
@@ -137,9 +137,9 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 			}
 			break;	
 		case "USER_ROLE_SAVE":
-			if (!request.containsParam(PrefCacheUtil.PREFFORMS)) {
+			if (!request.containsParam(PrefCacheUtil.PREFFORMKEYS)) {
 				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_USER_ROLE_FORM"));
-				request.addParam(PrefCacheUtil.PREFFORMS, forms);
+				request.addParam(PrefCacheUtil.PREFFORMKEYS, forms);
 			}
 			request.addParam(PrefCacheUtil.PREFGLOBAL, global);
 			prefCacheUtil.getPrefInfo(request,response);
