@@ -73,7 +73,7 @@ public class PrefAdminSvcImpl extends PrefSvcImpl implements ServiceProcessor, P
 			break;
 		case "SAVE":
 			if (!request.containsParam(PrefCacheUtil.PREFFORMKEYS)) {
-				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_PREFERENCE_PAGE"));
+				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_PREFERENCE_FORM"));
 				request.addParam(PrefCacheUtil.PREFFORMKEYS, forms);
 			}
 			request.addParam(PrefCacheUtil.PREFGLOBAL, global);

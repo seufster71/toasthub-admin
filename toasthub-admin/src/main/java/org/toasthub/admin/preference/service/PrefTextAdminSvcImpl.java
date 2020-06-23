@@ -73,7 +73,7 @@ public class PrefTextAdminSvcImpl extends PrefTextSvcImpl implements ServiceProc
 			break;
 		case "SAVE":
 			if (!request.containsParam(PrefCacheUtil.PREFFORMKEYS)) {
-				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_TEXT_PAGE"));
+				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_TEXT_FORM"));
 				request.addParam(PrefCacheUtil.PREFFORMKEYS, forms);
 			}
 			request.addParam(PrefCacheUtil.PREFGLOBAL, global);

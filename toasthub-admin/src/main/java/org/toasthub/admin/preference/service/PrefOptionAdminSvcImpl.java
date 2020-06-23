@@ -73,7 +73,7 @@ public class PrefOptionAdminSvcImpl extends PrefOptionSvcImpl implements Service
 			break;
 		case "SAVE":
 			if (!request.containsParam(PrefCacheUtil.PREFFORMKEYS)) {
-				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_OPTION_PAGE"));
+				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_OPTION_FORM"));
 				request.addParam(PrefCacheUtil.PREFFORMKEYS, forms);
 			}
 			request.addParam(PrefCacheUtil.PREFGLOBAL, global);

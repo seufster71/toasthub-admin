@@ -73,7 +73,7 @@ public class PrefLabelAdminSvcImpl extends PrefLabelSvcImpl implements ServicePr
 			break;
 		case "SAVE":
 			if (!request.containsParam(PrefCacheUtil.PREFFORMKEYS)) {
-				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_LABEL_PAGE"));
+				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_LABEL_FORM"));
 				request.addParam(PrefCacheUtil.PREFFORMKEYS, forms);
 			}
 			request.addParam(PrefCacheUtil.PREFGLOBAL, global);
