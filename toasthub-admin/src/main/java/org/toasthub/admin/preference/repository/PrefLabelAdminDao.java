@@ -24,4 +24,5 @@ public interface PrefLabelAdminDao extends PrefLabelDao {
 
 	public void save(RestRequest request, RestResponse response) throws Exception;
 	public void delete(RestRequest request, RestResponse response) throws Exception;
+	public void moveSave(RestRequest request, RestResponse response);
 }

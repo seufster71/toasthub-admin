@@ -24,5 +24,5 @@ import org.toasthub.core.preference.service.PrefLabelSvc;
 public interface PrefLabelAdminSvc extends PrefLabelSvc {
 
 	public void save(RestRequest request, RestResponse response) throws Exception;
-	
+	public void moveSave(RestRequest request, RestResponse response);
 }

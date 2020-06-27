@@ -24,5 +24,5 @@ import org.toasthub.core.preference.service.PrefFormFieldSvc;
 public interface PrefFormFieldAdminSvc extends PrefFormFieldSvc {
 
 	public void save(RestRequest request, RestResponse response) throws Exception;
-	
+	public void moveSave(RestRequest request, RestResponse response);
 }

@@ -16,6 +16,9 @@
 
 package org.toasthub.admin.preference.repository;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.toasthub.core.general.model.GlobalConstant;
@@ -34,6 +37,14 @@ public class PrefFormFieldAdminDaoImpl extends PrefFormFieldDaoImpl implements P
 	public void save(RestRequest request, RestResponse response) throws Exception {
 		PrefFormFieldName prefFormFieldName = (PrefFormFieldName) request.getParam(GlobalConstant.ITEM);
 		if (prefFormFieldName.getPrefName() == null) {
+			// get highest order
+			Object max = entityManagerDataSvc.getInstance().createQuery("SELECT max(x.sortOrder) FROM PrefFormFieldName AS x ").getSingleResult();
+			if (max != null) {
+				int order = (int) max + 1;
+				prefFormFieldName.setSortOrder(order);
+			} else {
+				prefFormFieldName.setSortOrder(1);
+			}
 			PrefName prefName = (PrefName) entityManagerDataSvc.getInstance().getReference(PrefName.class, new Long((Integer) request.getParam("parentId")));
 			prefFormFieldName.setPrefName(prefName);
 		}
@@ -48,6 +59,40 @@ public class PrefFormFieldAdminDaoImpl extends PrefFormFieldDaoImpl implements P
 			
 		} else {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);
+		}
+	}
+
+	@Override
+	public void moveSave(RestRequest request, RestResponse response) {
+		// get list of id and current order
+		List<Long> list = entityManagerDataSvc.getInstance().createQuery("SELECT x.id FROM PrefFormFieldName AS x WHERE x.prefName.id =:parentId ORDER BY x.sortOrder")
+				.setParameter("parentId", new Long((Integer) request.getParam(GlobalConstant.PARENTID))).getResultList();
+		
+		// update order
+		Long moveSelectedItemId = new Long((Integer) request.getParam(GlobalConstant.MOVESELECTEDITEMID));
+		Long itemId = new Long((Integer) request.getParam(GlobalConstant.ITEMID));
+		List<Long> updatedList = new ArrayList<Long>();
+		for(Long item : list) {
+			if ( item.equals(itemId) ){
+				if ("MOVEABOVE".equals(request.getParam(GlobalConstant.CODE))) {
+					updatedList.add(moveSelectedItemId);
+					updatedList.add(item);
+				} else if ("MOVEBELOW".equals(request.getParam(GlobalConstant.CODE))) {
+					updatedList.add(item);
+					updatedList.add(moveSelectedItemId);
+				}
+			} else if (item.equals(moveSelectedItemId) ) {
+				// do nothing
+			} else {
+				updatedList.add(item);
+			}
+		}
+		
+		// save orderr
+		int count = 1;
+		for (Long item : updatedList) {
+			entityManagerDataSvc.getInstance().createQuery("UPDATE PrefFormFieldName set sortOrder =:orderNum WHERE id =:itemId").setParameter("itemId",item).setParameter("orderNum", count).executeUpdate();
+			count++;
 		}
 	}
 }

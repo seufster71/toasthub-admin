@@ -80,6 +80,9 @@ public class PrefFormFieldAdminSvcImpl extends PrefFormFieldSvcImpl implements S
 			prefCacheUtil.getPrefInfo(request,response);
 			this.save(request, response);
 			break;
+		case "MOVE_SAVE":
+			this.moveSave(request, response);
+			break;
 		default:
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.ACTIONNOTEXIST, prefCacheUtil.getPrefText("GLOBAL_SERVICE", "GLOBAL_SERVICE_ACTION_NOT_AVAIL",prefCacheUtil.getLang(request)), response);
 			break;
@@ -139,6 +142,17 @@ public class PrefFormFieldAdminSvcImpl extends PrefFormFieldSvcImpl implements S
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, prefCacheUtil.getPrefText("GLOBAL_SERVICE", "GLOBAL_SERVICE_SAVE_SUCCESS",prefCacheUtil.getLang(request)), response);
 		} catch (Exception e) {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, prefCacheUtil.getPrefText("GLOBAL_SERVICE", "GLOBAL_SERVICE_SAVE_FAIL",prefCacheUtil.getLang(request)), response);
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void moveSave(RestRequest request, RestResponse response) {
+		try {
+			prefFormFieldAdminDao.moveSave(request, response);
+			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, prefCacheUtil.getPrefText("GLOBAL_SERVICE", "GLOBAL_SERVICE_SAVE_SUCCESS",prefCacheUtil.getLang(request)), response);
+		} catch (Exception e) {
+			utilSvc.addStatus(RestResponse.ERROR, RestResponse.EXECUTIONFAILED, prefCacheUtil.getPrefText("GLOBAL_SERVICE", "GLOBAL_SERVICE_EXECUTION_FAIL",prefCacheUtil.getLang(request)), response);
 			e.printStackTrace();
 		}
 	}
