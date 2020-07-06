@@ -37,7 +37,16 @@ public class PrefLabelAdminDaoImpl extends PrefLabelDaoImpl implements PrefLabel
 	public void save(RestRequest request, RestResponse response) throws Exception {
 		PrefLabelName prefLabelName = (PrefLabelName) request.getParam(GlobalConstant.ITEM);
 		if (prefLabelName.getPrefName() == null) {
-			PrefName prefName = (PrefName) entityManagerDataSvc.getInstance().getReference(PrefName.class, new Long((Integer) request.getParam("parentId")));
+			// get highest order
+			Object max = entityManagerDataSvc.getInstance().createQuery("SELECT max(x.sortOrder) FROM PrefLabelName AS x WHERE x.prefName.id =:parentId ")
+					.setParameter("parentId", new Long((Integer) request.getParam(GlobalConstant.PARENTID))).getSingleResult();
+			if (max != null) {
+				int order = (int) max + 1;
+				prefLabelName.setSortOrder(order);
+			} else {
+				prefLabelName.setSortOrder(1);
+			}
+			PrefName prefName = (PrefName) entityManagerDataSvc.getInstance().getReference(PrefName.class, new Long((Integer) request.getParam(GlobalConstant.PARENTID)));
 			prefLabelName.setPrefName(prefName);
 		}
 		entityManagerDataSvc.getInstance().merge(prefLabelName);
@@ -57,34 +66,34 @@ public class PrefLabelAdminDaoImpl extends PrefLabelDaoImpl implements PrefLabel
 	@Override
 	public void moveSave(RestRequest request, RestResponse response) {
 		// get list of id and current order
-				List<Long> list = entityManagerDataSvc.getInstance().createQuery("SELECT x.id FROM PrefLabelName AS x WHERE x.prefName.id =:parentId ORDER BY x.sortOrder")
-						.setParameter("parentId", new Long((Integer) request.getParam(GlobalConstant.PARENTID))).getResultList();
-				
-				// update order
-				Long moveSelectedItemId = new Long((Integer) request.getParam(GlobalConstant.MOVESELECTEDITEMID));
-				Long itemId = new Long((Integer) request.getParam(GlobalConstant.ITEMID));
-				List<Long> updatedList = new ArrayList<Long>();
-				for(Long item : list) {
-					if ( item.equals(itemId) ){
-						if ("MOVEABOVE".equals(request.getParam(GlobalConstant.CODE))) {
-							updatedList.add(moveSelectedItemId);
-							updatedList.add(item);
-						} else if ("MOVEBELOW".equals(request.getParam(GlobalConstant.CODE))) {
-							updatedList.add(item);
-							updatedList.add(moveSelectedItemId);
-						}
-					} else if (item.equals(moveSelectedItemId) ) {
-						// do nothing
-					} else {
-						updatedList.add(item);
-					}
+		List<Long> list = entityManagerDataSvc.getInstance().createQuery("SELECT x.id FROM PrefLabelName AS x WHERE x.prefName.id =:parentId ORDER BY x.sortOrder")
+				.setParameter("parentId", new Long((Integer) request.getParam(GlobalConstant.PARENTID))).getResultList();
+		
+		// update order
+		Long moveSelectedItemId = new Long((Integer) request.getParam(GlobalConstant.MOVESELECTEDITEMID));
+		Long itemId = new Long((Integer) request.getParam(GlobalConstant.ITEMID));
+		List<Long> updatedList = new ArrayList<Long>();
+		for(Long item : list) {
+			if ( item.equals(itemId) ){
+				if ("MOVEABOVE".equals(request.getParam(GlobalConstant.CODE))) {
+					updatedList.add(moveSelectedItemId);
+					updatedList.add(item);
+				} else if ("MOVEBELOW".equals(request.getParam(GlobalConstant.CODE))) {
+					updatedList.add(item);
+					updatedList.add(moveSelectedItemId);
 				}
-				
-				// save orderr
-				int count = 1;
-				for (Long item : updatedList) {
-					entityManagerDataSvc.getInstance().createQuery("UPDATE PrefLabelName set sortOrder =:orderNum WHERE id =:itemId").setParameter("itemId",item).setParameter("orderNum", count).executeUpdate();
-					count++;
-				}
+			} else if (item.equals(moveSelectedItemId) ) {
+				// do nothing
+			} else {
+				updatedList.add(item);
+			}
+		}
+		
+		// save orderr
+		int count = 1;
+		for (Long item : updatedList) {
+			entityManagerDataSvc.getInstance().createQuery("UPDATE PrefLabelName set sortOrder =:orderNum WHERE id =:itemId").setParameter("itemId",item).setParameter("orderNum", count).executeUpdate();
+			count++;
+		}
 	}
 }

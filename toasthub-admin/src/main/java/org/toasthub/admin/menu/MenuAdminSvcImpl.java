@@ -18,6 +18,8 @@ package org.toasthub.admin.menu;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -49,67 +51,79 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 	@Override
 	public void process(RestRequest request, RestResponse response) {
 		String action = (String) request.getParams().get(GlobalConstant.ACTION);
+		List<String> global =  new ArrayList<String>(Arrays.asList("LANGUAGES"));
 		
 		Long count = 0l;
 		switch (action) {
 		case "INIT": 
 			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
 			prefCacheUtil.getPrefInfo(request,response);
-			//appCachePage.getGlobalInfo(request,response);
-			
-			this.initParams(request);
-			this.itemColumns(request, response);
-			request.addParam(GlobalConstant.SHOWALL, true);
-			this.getMenuCount(request, response);
+			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
-				this.getMenus(request, response);
+				this.items(request, response);
 			}
-			
 			break;
 		case "LIST":
 			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
 			prefCacheUtil.getPrefInfo(request,response);
-			
-			this.initParams(request);
-			this.itemColumns(request, response);
-			request.addParam(GlobalConstant.SHOWALL, true);
-			this.getMenuCount(request, response);
+			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
 			if (count != null && count > 0){
-				this.getMenus(request, response);
-			}
-			response.addParam(GlobalConstant.PARENTID, request.getParam(GlobalConstant.PARENTID));
-			break;
-		case "LIST_MENUITEMS":
-			
-			this.initParams(request);
-		
-			this.getMenuItemCount(request, response);
-			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
-			if (count != null && count > 0){
-				this.getMenuItems(request, response);
-			}
-			if (request.containsParam(GlobalConstant.PARENTID)){
-				response.addParam(GlobalConstant.PARENTID, request.getParam(GlobalConstant.PARENTID));
-			} else {
-				response.addParam(GlobalConstant.PARENTID, request.getParam(Menu.ID));
+				this.items(request, response);
 			}
 			break;
-		case "SHOW":
-			this.getMenu(request, response);
-			if (request.containsParam(GlobalConstant.PARENTID)){
-				response.addParam(GlobalConstant.PARENTID,(Integer) request.getParam(GlobalConstant.PARENTID));
-			}
-			response.addParam(Menu.ID,(Integer) request.getParam(Menu.ID));
-			response.addParam(GlobalConstant.ID,request.getParam(GlobalConstant.ID));
+		case "ITEM":
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
+			this.item(request, response);
 			break;
 		case "DELETE":
 			this.delete(request, response);
 			break;
 		case "SAVE":
+			if (!request.containsParam(PrefCacheUtil.PREFFORMKEYS)) {
+				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_MENU_FORM"));
+				request.addParam(PrefCacheUtil.PREFFORMKEYS, forms);
+			}
+			request.addParam(PrefCacheUtil.PREFGLOBAL, global);
 			prefCacheUtil.getPrefInfo(request,response);
 			this.save(request, response);
+			break;
+		case "INIT_SUBITEMS": 
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
+			this.itemCount(request, response);
+			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
+			if (count != null && count > 0){
+				this.subItems(request, response);
+			}
+			break;
+		case "LIST_SUBITEMS":
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
+			this.subItemCount(request, response);
+			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
+			if (count != null && count > 0){
+				this.subItems(request, response);
+			}
+			break;
+		case "SUBITEM":
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
+			this.subItem(request, response);
+			break;
+		case "DELETE_SUBITEM":
+			this.deleteSubItem(request, response);
+			break;
+		case "SAVE_SUBITEM":
+			if (!request.containsParam(PrefCacheUtil.PREFFORMKEYS)) {
+				List<String> forms =  new ArrayList<String>(Arrays.asList("ADMIN_MENU_FORM"));
+				request.addParam(PrefCacheUtil.PREFFORMKEYS, forms);
+			}
+			request.addParam(PrefCacheUtil.PREFGLOBAL, global);
+			prefCacheUtil.getPrefInfo(request,response);
+			this.saveSubItem(request, response);
 			break;
 		default:
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.ACTIONNOTEXIST, "Action not available", response);
@@ -137,38 +151,26 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 	@Override
 	public void save(RestRequest request, RestResponse response) {
 		try {
-			if ( !request.containsParam(GlobalConstant.ITEMTYPE) ){
-				request.addParam(GlobalConstant.ITEMTYPE, "menu");
-				if (!request.containsParam(PrefCacheUtil.PREFFORMKEYS)) {
-					request.addParam(PrefCacheUtil.PREFFORMKEYS, new ArrayList<String>(Arrays.asList("APP_MENU_FORM")));
-				}
-			}
-			
 			// validate
 			utilSvc.validateParams(request, response);
 			
 			if ((Boolean) request.getParam(GlobalConstant.VALID) == false) {
-				utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Validation Error", response);
+				utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, prefCacheUtil.getPrefText("GLOBAL_SERVICE", "GLOBAL_SERVICE_VALIDATION_ERR",prefCacheUtil.getLang(request)), response);
 				return;
 			}
 			
 			// get existing item
-			if (request.containsParam(GlobalConstant.ITEMID) && !request.getParam(GlobalConstant.ITEMID).equals("")) {
+			Map<String,Object> inputList = (Map<String, Object>) request.getParam(GlobalConstant.INPUTFIELDS);
+			if (inputList.containsKey(GlobalConstant.ITEMID) && inputList.get(GlobalConstant.ITEMID) != null && !"".equals(inputList.get(GlobalConstant.ITEMID))) {
+				request.addParam(GlobalConstant.ITEMID, inputList.get(GlobalConstant.ITEMID));
 				menuAdminDao.item(request, response);
 				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
 				response.getParams().remove(GlobalConstant.ITEM);
 			} else {
-				if ("subItem".equals(request.getParam(GlobalConstant.ITEMTYPE)) || "subSub".equals(request.getParam(GlobalConstant.ITEMTYPE))){
-					MenuItem menuItem = new MenuItem();
-					menuItem.setArchive(false);
-					menuItem.setLocked(false);
-					request.addParam(GlobalConstant.ITEM, menuItem);
-				} else {
-					Menu menu = new Menu();
-					menu.setArchive(false);
-					menu.setLocked(false);
-					request.addParam(GlobalConstant.ITEM, menu);
-				}
+				Menu menu = new Menu();
+				menu.setArchive(false);
+				menu.setLocked(false);
+				request.addParam(GlobalConstant.ITEM, menu);
 			}
 			// marshall
 			utilSvc.marshallFields(request, response);
@@ -179,11 +181,62 @@ public class MenuAdminSvcImpl extends MenuSvcImpl implements ServiceProcessor, M
 			// reset cache
 			appCacheMenuUtil.reloadMenuCache();
 			
-			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Menu Save Successful", response);
-		//} catch (PrivilegesException pe){
-		//	utilSvc.addStatus(RestResponse.ERROR, RestResponse.SERVERERROR, pe.getMessage(), response);
+			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, prefCacheUtil.getPrefText("GLOBAL_SERVICE", "GLOBAL_SERVICE_SAVE_SUCCESS",prefCacheUtil.getLang(request)), response);
 		} catch (Exception e) {
-			utilSvc.addStatus(RestResponse.ERROR, RestResponse.EXECUTIONFAILED, "Menu Save Failed", response);
+			utilSvc.addStatus(RestResponse.ERROR, RestResponse.EXECUTIONFAILED, prefCacheUtil.getPrefText("GLOBAL_SERVICE", "GLOBAL_SERVICE_SAVE_FAIL",prefCacheUtil.getLang(request)), response);
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void deleteSubItem(RestRequest request, RestResponse response) {
+		try {
+			menuAdminDao.deleteSubItem(request, response);
+			// reset cache
+			appCacheMenuUtil.reloadMenuCache();
+			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Menu Delete Successful", response);
+		} catch (Exception e) {
+			utilSvc.addStatus(RestResponse.ERROR, RestResponse.EXECUTIONFAILED, "Menu Delete Failed", response);
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void saveSubItem(RestRequest request, RestResponse response) {
+		try {
+			// validate
+			utilSvc.validateParams(request, response);
+			
+			if ((Boolean) request.getParam(GlobalConstant.VALID) == false) {
+				utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, prefCacheUtil.getPrefText("GLOBAL_SERVICE", "GLOBAL_SERVICE_VALIDATION_ERR",prefCacheUtil.getLang(request)), response);
+				return;
+			}
+			
+			// get existing item
+			Map<String,Object> inputList = (Map<String, Object>) request.getParam(GlobalConstant.INPUTFIELDS);
+			if (inputList.containsKey(GlobalConstant.ITEMID) && inputList.get(GlobalConstant.ITEMID) != null && !"".equals(inputList.get(GlobalConstant.ITEMID))) {
+				request.addParam(GlobalConstant.ITEMID, inputList.get(GlobalConstant.ITEMID));
+				menuAdminDao.subItem(request, response);
+				request.addParam(GlobalConstant.ITEM, response.getParam(GlobalConstant.ITEM));
+				response.getParams().remove(GlobalConstant.ITEM);
+			} else {
+				MenuItem menu = new MenuItem();
+				menu.setArchive(false);
+				menu.setLocked(false);
+				request.addParam(GlobalConstant.ITEM, menu);
+			}
+			// marshall
+			utilSvc.marshallFields(request, response);
+			
+			// save
+			menuAdminDao.saveSubItem(request, response);
+			
+			// reset cache
+			appCacheMenuUtil.reloadMenuCache();
+			
+			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, prefCacheUtil.getPrefText("GLOBAL_SERVICE", "GLOBAL_SERVICE_SAVE_SUCCESS",prefCacheUtil.getLang(request)), response);
+		} catch (Exception e) {
+			utilSvc.addStatus(RestResponse.ERROR, RestResponse.EXECUTIONFAILED, prefCacheUtil.getPrefText("GLOBAL_SERVICE", "GLOBAL_SERVICE_SAVE_FAIL",prefCacheUtil.getLang(request)), response);
 			e.printStackTrace();
 		}
 	}

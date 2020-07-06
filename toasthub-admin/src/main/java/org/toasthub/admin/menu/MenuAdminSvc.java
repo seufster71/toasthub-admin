@@ -24,4 +24,6 @@ public interface MenuAdminSvc extends MenuSvc {
 
 	public void delete(RestRequest request, RestResponse response);
 	public void save(RestRequest request, RestResponse response);
+	public void deleteSubItem(RestRequest request, RestResponse response);
+	public void saveSubItem(RestRequest request, RestResponse response);
 }

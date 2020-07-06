@@ -38,7 +38,8 @@ public class PrefFormFieldAdminDaoImpl extends PrefFormFieldDaoImpl implements P
 		PrefFormFieldName prefFormFieldName = (PrefFormFieldName) request.getParam(GlobalConstant.ITEM);
 		if (prefFormFieldName.getPrefName() == null) {
 			// get highest order
-			Object max = entityManagerDataSvc.getInstance().createQuery("SELECT max(x.sortOrder) FROM PrefFormFieldName AS x ").getSingleResult();
+			Object max = entityManagerDataSvc.getInstance().createQuery("SELECT max(x.sortOrder) FROM PrefFormFieldName AS x WHERE x.prefName.id =:parentId ")
+					.setParameter("parentId", new Long((Integer) request.getParam(GlobalConstant.PARENTID))).getSingleResult();
 			if (max != null) {
 				int order = (int) max + 1;
 				prefFormFieldName.setSortOrder(order);

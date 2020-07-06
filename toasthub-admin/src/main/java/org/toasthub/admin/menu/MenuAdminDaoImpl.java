@@ -32,6 +32,22 @@ public class MenuAdminDaoImpl extends MenuDaoImpl implements MenuAdminDao {
 	
 	//@Authorize
 	public void save(RestRequest request, RestResponse response) throws Exception {
+		Menu menu = (Menu) request.getParam(GlobalConstant.ITEM);
+		entityManagerDataSvc.getInstance().merge(menu);
+	}
+
+	//@Authorize
+	public void delete(RestRequest request, RestResponse response) throws Exception {
+		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
+			Menu menu = (Menu) entityManagerDataSvc.getInstance().getReference(Menu.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			entityManagerDataSvc.getInstance().remove(menu);
+		} else {
+			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);
+		}
+		
+	}
+	
+	public void saveSubItem(RestRequest request, RestResponse response) throws Exception {
 		if ("subItem".equals(request.getParam(GlobalConstant.ITEMTYPE))) {
 			// menu reference
 			MenuItem menuItem = (MenuItem) request.getParam(GlobalConstant.ITEM);
@@ -53,17 +69,11 @@ public class MenuAdminDaoImpl extends MenuDaoImpl implements MenuAdminDao {
 			entityManagerDataSvc.getInstance().merge(menu);
 		}
 	}
-
-	//@Authorize
-	public void delete(RestRequest request, RestResponse response) throws Exception {
+	
+	public void deleteSubItem(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
-			if (request.containsParam(GlobalConstant.ITEMTYPE) && "subItem".equals(request.getParam(GlobalConstant.ITEMTYPE)) ) {
-				MenuItem menuItem = (MenuItem) entityManagerDataSvc.getInstance().getReference(MenuItem.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
-				entityManagerDataSvc.getInstance().remove(menuItem);
-			} else {
-				Menu menu = (Menu) entityManagerDataSvc.getInstance().getReference(Menu.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
-				entityManagerDataSvc.getInstance().remove(menu);
-			}
+			MenuItem menuItem = (MenuItem) entityManagerDataSvc.getInstance().getReference(MenuItem.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			entityManagerDataSvc.getInstance().remove(menuItem);
 		} else {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);
 		}

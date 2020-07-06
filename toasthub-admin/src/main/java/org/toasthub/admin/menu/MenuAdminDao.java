@@ -23,5 +23,7 @@ import org.toasthub.core.menu.MenuDao;
 public interface MenuAdminDao extends MenuDao {
 
 	public void save(RestRequest request, RestResponse response) throws Exception;
+	public void saveSubItem(RestRequest request, RestResponse response) throws Exception;
 	public void delete(RestRequest request, RestResponse response) throws Exception;
+	public void deleteSubItem(RestRequest request, RestResponse response) throws Exception;
 }

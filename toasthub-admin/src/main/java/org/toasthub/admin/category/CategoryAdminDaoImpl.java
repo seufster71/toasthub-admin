@@ -30,8 +30,8 @@ public class CategoryAdminDaoImpl extends CategoryDaoImpl implements CategoryAdm
 	
 	//@Authorize
 	public void save(RestRequest request, RestResponse response) throws Exception {
-		Category category = (Category) request.getParam("category");
-		
+		Category category = (Category) request.getParam(GlobalConstant.ITEM);
+		entityManagerDataSvc.getInstance().merge(category);
 	}
 	
 	//@Authorize

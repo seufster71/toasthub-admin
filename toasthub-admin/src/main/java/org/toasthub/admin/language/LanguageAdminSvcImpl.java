@@ -58,7 +58,6 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 			prefCacheUtil.getPrefInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
-			this.itemColumns(request, response);
 			if (count != null && count > 0){
 				this.items(request, response);
 			}
@@ -69,7 +68,6 @@ public class LanguageAdminSvcImpl extends LanguageSvcImpl implements ServiceProc
 			prefCacheUtil.getPrefInfo(request,response);
 			this.itemCount(request, response);
 			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
-			this.itemColumns(request, response);
 			if (count != null && count > 0){
 				this.items(request, response);
 			}
