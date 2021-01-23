@@ -80,7 +80,7 @@ public class PermissionAdminDaoImpl extends PermissionDaoImpl implements Permiss
 		RolePermission rolePermission = (RolePermission) request.getParam(GlobalConstant.ITEM);
 		
 		if (rolePermission.getRole() == null) {
-			Role role = (Role) entityManagerSecuritySvc.getInstance().getReference(Role.class,  new Long((Integer) request.getParam("roleId")));
+			Role role = (Role) entityManagerSecuritySvc.getInstance().getReference(Role.class,  new Long((Integer) request.getParam(GlobalConstant.PARENTID)));
 			rolePermission.setRole(role);
 		}
 		if (rolePermission.getPermission() == null) {

@@ -54,6 +54,15 @@ public class PrefFormFieldAdminSvcImpl extends PrefFormFieldSvcImpl implements S
 		
 		Long count = 0l;
 		switch (action) {
+		case "INIT":
+			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
+			prefCacheUtil.getPrefInfo(request,response);
+			itemCount(request, response);
+			count = (Long) response.getParam(GlobalConstant.ITEMCOUNT);
+			if (count != null && count > 0){
+				items(request, response);
+			}
+			break;
 		case "LIST":
 			request.addParam(PrefCacheUtil.PREFPARAMLOC, PrefCacheUtil.RESPONSE);
 			prefCacheUtil.getPrefInfo(request,response);

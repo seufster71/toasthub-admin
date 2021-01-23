@@ -68,7 +68,7 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 			if (count != null && count > 0){
 				this.items(request, response);
 			}
-			if (request.containsParam("userId") && !"".equals(request.getParam("userId"))) {
+			if (request.containsParam(GlobalConstant.PARENTID) && !"".equals(request.getParam(GlobalConstant.PARENTID))) {
 				roleAdminDao.userRoleIds(request, response);
 				// add user role to items
 				List<UserRole> userRoles = (List<UserRole>) response.getParam("userRoles");
@@ -90,7 +90,7 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 			if (count != null && count > 0){
 				this.items(request, response);
 			}
-			if (request.containsParam("userId") && !"".equals(request.getParam("userId"))) {
+			if (request.containsParam(GlobalConstant.PARENTID) && !"".equals(request.getParam(GlobalConstant.PARENTID))) {
 				roleAdminDao.userRoleIds(request, response);
 				// add user role to items
 				List<UserRole> userRoles = (List<UserRole>) response.getParam("userRoles");

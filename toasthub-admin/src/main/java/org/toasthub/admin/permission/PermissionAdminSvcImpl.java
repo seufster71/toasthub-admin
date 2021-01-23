@@ -68,7 +68,7 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 			if (count != null && count > 0){
 				items(request, response);
 			}
-			if (request.containsParam("roleId") && !"".equals(request.getParam("roleId"))) {
+			if (request.containsParam(GlobalConstant.PARENTID) && !"".equals(request.getParam(GlobalConstant.PARENTID))) {
 				permissionAdminDao.rolePermissionIds(request,response);
 				// add role permissions to items
 				List<RolePermission> rolePermissions = (List<RolePermission>) response.getParam("rolePermissions");
@@ -92,7 +92,7 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 			if (count != null && count > 0){
 				this.items(request, response);
 			}
-			if (request.containsParam("roleId") && !"".equals(request.getParam("roleId"))) {
+			if (request.containsParam(GlobalConstant.PARENTID) && !"".equals(request.getParam(GlobalConstant.PARENTID))) {
 				permissionAdminDao.rolePermissionIds(request,response);
 				// add role permissions to items
 				List<RolePermission> rolePermissions = (List<RolePermission>) response.getParam("rolePermissions");
