@@ -52,6 +52,7 @@ public class PermissionAdminSvcImpl extends PermissionSvcImpl implements Service
 	UtilSvc utilSvc;
 	
 	@Autowired
+	@Qualifier("ApplicationSvc")
 	ApplicationSvc applicationSvc;
 	
 	@Override

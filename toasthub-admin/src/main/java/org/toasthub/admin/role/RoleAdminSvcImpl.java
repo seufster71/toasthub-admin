@@ -52,6 +52,7 @@ public class RoleAdminSvcImpl extends RoleSvcImpl implements ServiceProcessor, R
 	UtilSvc utilSvc;
 	
 	@Autowired
+	@Qualifier("ApplicationSvc")
 	ApplicationSvc applicationSvc;
 	
 	@Override
