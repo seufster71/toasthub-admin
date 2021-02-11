@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.toasthub.admin.menu.MenuAdminSvc;
 import org.toasthub.core.common.EntityManagerMainSvc;
@@ -34,8 +35,8 @@ import org.toasthub.core.general.model.MenuItem;
 import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.preference.model.PrefCacheUtil;
+import org.toasthub.security.model.MyUserPrincipal;
 import org.toasthub.security.model.User;
-import org.toasthub.security.model.UserContext;
 
 @Service("AdminSvc")
 public class AdminSvcImpl implements ServiceProcessor, AdminSvc {
@@ -57,9 +58,6 @@ public class AdminSvcImpl implements ServiceProcessor, AdminSvc {
 	
 	@Autowired
 	PrefCacheUtil prefCacheUtil;
-	
-	@Autowired 
-	UserContext userContext;
 
 	// Constructors
 	public AdminSvcImpl() {}
@@ -70,12 +68,6 @@ public class AdminSvcImpl implements ServiceProcessor, AdminSvc {
 		
 		this.setupDefaults(request);
 		User user = null;
-		String name = "";
-		if (userContext != null && userContext.getCurrentUser() != null){
-			user = userContext.getCurrentUser();
-		} else {
-			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "User is not authenticated", response);
-		}
 		
 		switch (action) {
 		case "INIT":
@@ -86,7 +78,7 @@ public class AdminSvcImpl implements ServiceProcessor, AdminSvc {
 			if (request.containsParam(GlobalConstant.MENUNAMES)){
 				this.initMenu(request, response);
 			}
-			response.addParam("USER", user);
+			response.addParam("USER", ((MyUserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser());
 			break;
 		case "INIT_MENU":
 			this.setMenuDefaults(request);
@@ -109,12 +101,6 @@ public class AdminSvcImpl implements ServiceProcessor, AdminSvc {
 			menuList.put(menuName, menu);
 		}
 		
-		String name = "";
-		if (userContext != null && userContext.getCurrentUser() != null){
-			name = name.concat(userContext.getCurrentUser().getFirstname());
-			name = name.concat(" ").concat(userContext.getCurrentUser().getLastname());
-		}
-		response.addParam("username", name);
 		
 		if (!menuList.isEmpty()){
 			response.addParam(RestResponse.MENUS, menuList);
