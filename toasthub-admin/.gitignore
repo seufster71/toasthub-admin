@@ -23,3 +23,6 @@ nbdist/
 
 ### MAC
 *.DS_Store
+/node_modules/
+/bin/
+/package-lock.json
