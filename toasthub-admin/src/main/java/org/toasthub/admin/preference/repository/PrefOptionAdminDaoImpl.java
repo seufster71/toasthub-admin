@@ -33,7 +33,7 @@ public class PrefOptionAdminDaoImpl extends PrefOptionDaoImpl implements PrefOpt
 	public void save(RestRequest request, RestResponse response) throws Exception {
 		PrefOptionName prefOptionName = (PrefOptionName) request.getParam(GlobalConstant.ITEM);
 		if (prefOptionName.getPrefName() == null) {
-			PrefName prefName = (PrefName) entityManagerDataSvc.getInstance().getReference(PrefName.class, new Long((Integer) request.getParam("parentId")));
+			PrefName prefName = (PrefName) entityManagerDataSvc.getInstance().getReference(PrefName.class, Long.valueOf((Integer) request.getParam("parentId")));
 			prefOptionName.setPrefName(prefName);
 		}
 		entityManagerDataSvc.getInstance().merge(prefOptionName);
@@ -42,7 +42,7 @@ public class PrefOptionAdminDaoImpl extends PrefOptionDaoImpl implements PrefOpt
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
-			PrefOptionName prefOptionName = (PrefOptionName) entityManagerDataSvc.getInstance().getReference(PrefOptionName.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			PrefOptionName prefOptionName = (PrefOptionName) entityManagerDataSvc.getInstance().getReference(PrefOptionName.class, Long.valueOf((Integer) request.getParam(GlobalConstant.ITEMID)));
 			entityManagerDataSvc.getInstance().remove(prefOptionName);
 			
 		} else {

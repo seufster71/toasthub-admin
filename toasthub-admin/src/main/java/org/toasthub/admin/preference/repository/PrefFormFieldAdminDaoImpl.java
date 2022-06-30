@@ -39,14 +39,14 @@ public class PrefFormFieldAdminDaoImpl extends PrefFormFieldDaoImpl implements P
 		if (prefFormFieldName.getPrefName() == null) {
 			// get highest order
 			Object max = entityManagerDataSvc.getInstance().createQuery("SELECT max(x.sortOrder) FROM PrefFormFieldName AS x WHERE x.prefName.id =:parentId ")
-					.setParameter("parentId", new Long((Integer) request.getParam(GlobalConstant.PARENTID))).getSingleResult();
+					.setParameter("parentId", Long.valueOf((Integer) request.getParam(GlobalConstant.PARENTID))).getSingleResult();
 			if (max != null) {
 				int order = (int) max + 1;
 				prefFormFieldName.setSortOrder(order);
 			} else {
 				prefFormFieldName.setSortOrder(1);
 			}
-			PrefName prefName = (PrefName) entityManagerDataSvc.getInstance().getReference(PrefName.class, new Long((Integer) request.getParam("parentId")));
+			PrefName prefName = (PrefName) entityManagerDataSvc.getInstance().getReference(PrefName.class, Long.valueOf((Integer) request.getParam("parentId")));
 			prefFormFieldName.setPrefName(prefName);
 		}
 		entityManagerDataSvc.getInstance().merge(prefFormFieldName);
@@ -55,7 +55,7 @@ public class PrefFormFieldAdminDaoImpl extends PrefFormFieldDaoImpl implements P
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
-			PrefFormFieldName prefFormFieldName = (PrefFormFieldName) entityManagerDataSvc.getInstance().getReference(PrefFormFieldName.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			PrefFormFieldName prefFormFieldName = (PrefFormFieldName) entityManagerDataSvc.getInstance().getReference(PrefFormFieldName.class, Long.valueOf((Integer) request.getParam(GlobalConstant.ITEMID)));
 			entityManagerDataSvc.getInstance().remove(prefFormFieldName);
 			
 		} else {
@@ -67,11 +67,11 @@ public class PrefFormFieldAdminDaoImpl extends PrefFormFieldDaoImpl implements P
 	public void moveSave(RestRequest request, RestResponse response) {
 		// get list of id and current order
 		List<Long> list = entityManagerDataSvc.getInstance().createQuery("SELECT x.id FROM PrefFormFieldName AS x WHERE x.prefName.id =:parentId ORDER BY x.sortOrder")
-				.setParameter("parentId", new Long((Integer) request.getParam(GlobalConstant.PARENTID))).getResultList();
+				.setParameter("parentId", Long.valueOf((Integer) request.getParam(GlobalConstant.PARENTID))).getResultList();
 		
 		// update order
-		Long moveSelectedItemId = new Long((Integer) request.getParam(GlobalConstant.MOVESELECTEDITEMID));
-		Long itemId = new Long((Integer) request.getParam(GlobalConstant.ITEMID));
+		Long moveSelectedItemId = Long.valueOf((Integer) request.getParam(GlobalConstant.MOVESELECTEDITEMID));
+		Long itemId = Long.valueOf((Integer) request.getParam(GlobalConstant.ITEMID));
 		List<Long> updatedList = new ArrayList<Long>();
 		for(Long item : list) {
 			if ( item.equals(itemId) ){

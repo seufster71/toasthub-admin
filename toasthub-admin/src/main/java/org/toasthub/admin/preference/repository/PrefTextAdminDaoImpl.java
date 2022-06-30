@@ -34,7 +34,7 @@ public class PrefTextAdminDaoImpl extends PrefTextDaoImpl implements PrefTextAdm
 	public void save(RestRequest request, RestResponse response) throws Exception {
 		PrefTextName prefTextName = (PrefTextName) request.getParam(GlobalConstant.ITEM);
 		if (prefTextName.getPrefName() == null) {
-			PrefName prefName = (PrefName) entityManagerDataSvc.getInstance().getReference(PrefName.class, new Long((Integer) request.getParam("parentId")));
+			PrefName prefName = (PrefName) entityManagerDataSvc.getInstance().getReference(PrefName.class, Long.valueOf((Integer) request.getParam("parentId")));
 			prefTextName.setPrefName(prefName);
 		}
 		entityManagerDataSvc.getInstance().merge(prefTextName);
@@ -43,7 +43,7 @@ public class PrefTextAdminDaoImpl extends PrefTextDaoImpl implements PrefTextAdm
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
-			PrefTextName prefTextName = (PrefTextName) entityManagerDataSvc.getInstance().getReference(PrefTextName.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			PrefTextName prefTextName = (PrefTextName) entityManagerDataSvc.getInstance().getReference(PrefTextName.class, Long.valueOf((Integer) request.getParam(GlobalConstant.ITEMID)));
 			entityManagerDataSvc.getInstance().remove(prefTextName);
 			
 		} else {

@@ -33,7 +33,7 @@ public class PrefAdminDaoImpl extends PrefDaoImpl implements PrefAdminDao {
 	public void save(RestRequest request, RestResponse response) throws Exception {
 		PrefName prefName = (PrefName) request.getParam(GlobalConstant.ITEM);
 		if (request.containsParam("prefProductId") && !"".equals(request.getParam("prefProductId"))) {
-			PrefProduct prefProduct = (PrefProduct) entityManagerDataSvc.getInstance().getReference(PrefProduct.class, new Long((Integer) request.getParam("prefProductId")));
+			PrefProduct prefProduct = (PrefProduct) entityManagerDataSvc.getInstance().getReference(PrefProduct.class, Long.valueOf((Integer) request.getParam("prefProductId")));
 		} else if (prefName.getPrefProduct() != null && prefName.getPrefProduct().getId().equals(prefName.getPrefProductId())) {
 			prefName.setPrefProduct(null);
 			PrefProduct prefProduct = (PrefProduct) entityManagerDataSvc.getInstance().getReference(PrefProduct.class, prefName.getPrefProductId());
@@ -49,7 +49,7 @@ public class PrefAdminDaoImpl extends PrefDaoImpl implements PrefAdminDao {
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
-			PrefName prefName = (PrefName) entityManagerDataSvc.getInstance().getReference(PrefName.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			PrefName prefName = (PrefName) entityManagerDataSvc.getInstance().getReference(PrefName.class, Long.valueOf((Integer) request.getParam(GlobalConstant.ITEMID)));
 			entityManagerDataSvc.getInstance().remove(prefName);
 		
 		} else {

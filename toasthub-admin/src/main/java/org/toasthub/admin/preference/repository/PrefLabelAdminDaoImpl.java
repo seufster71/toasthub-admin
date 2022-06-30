@@ -39,14 +39,14 @@ public class PrefLabelAdminDaoImpl extends PrefLabelDaoImpl implements PrefLabel
 		if (prefLabelName.getPrefName() == null) {
 			// get highest order
 			Object max = entityManagerDataSvc.getInstance().createQuery("SELECT max(x.sortOrder) FROM PrefLabelName AS x WHERE x.prefName.id =:parentId ")
-					.setParameter("parentId", new Long((Integer) request.getParam(GlobalConstant.PARENTID))).getSingleResult();
+					.setParameter("parentId", Long.valueOf((Integer) request.getParam(GlobalConstant.PARENTID))).getSingleResult();
 			if (max != null) {
 				int order = (int) max + 1;
 				prefLabelName.setSortOrder(order);
 			} else {
 				prefLabelName.setSortOrder(1);
 			}
-			PrefName prefName = (PrefName) entityManagerDataSvc.getInstance().getReference(PrefName.class, new Long((Integer) request.getParam(GlobalConstant.PARENTID)));
+			PrefName prefName = (PrefName) entityManagerDataSvc.getInstance().getReference(PrefName.class, Long.valueOf((Integer) request.getParam(GlobalConstant.PARENTID)));
 			prefLabelName.setPrefName(prefName);
 		}
 		entityManagerDataSvc.getInstance().merge(prefLabelName);
@@ -55,7 +55,7 @@ public class PrefLabelAdminDaoImpl extends PrefLabelDaoImpl implements PrefLabel
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
-			PrefLabelName prefLabelName = (PrefLabelName) entityManagerDataSvc.getInstance().getReference(PrefLabelName.class, new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			PrefLabelName prefLabelName = (PrefLabelName) entityManagerDataSvc.getInstance().getReference(PrefLabelName.class, Long.valueOf((Integer) request.getParam(GlobalConstant.ITEMID)));
 			entityManagerDataSvc.getInstance().remove(prefLabelName);
 			
 		} else {
@@ -67,11 +67,11 @@ public class PrefLabelAdminDaoImpl extends PrefLabelDaoImpl implements PrefLabel
 	public void moveSave(RestRequest request, RestResponse response) {
 		// get list of id and current order
 		List<Long> list = entityManagerDataSvc.getInstance().createQuery("SELECT x.id FROM PrefLabelName AS x WHERE x.prefName.id =:parentId ORDER BY x.sortOrder")
-				.setParameter("parentId", new Long((Integer) request.getParam(GlobalConstant.PARENTID))).getResultList();
+				.setParameter("parentId", Long.valueOf((Integer) request.getParam(GlobalConstant.PARENTID))).getResultList();
 		
 		// update order
-		Long moveSelectedItemId = new Long((Integer) request.getParam(GlobalConstant.MOVESELECTEDITEMID));
-		Long itemId = new Long((Integer) request.getParam(GlobalConstant.ITEMID));
+		Long moveSelectedItemId = Long.valueOf((Integer) request.getParam(GlobalConstant.MOVESELECTEDITEMID));
+		Long itemId = Long.valueOf((Integer) request.getParam(GlobalConstant.ITEMID));
 		List<Long> updatedList = new ArrayList<Long>();
 		for(Long item : list) {
 			if ( item.equals(itemId) ){

@@ -50,7 +50,7 @@ public class PermissionAdminDaoImpl extends PermissionDaoImpl implements Permiss
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
 			
-			Permission permission = (Permission) entityManagerSecuritySvc.getInstance().getReference(Permission.class,  new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			Permission permission = (Permission) entityManagerSecuritySvc.getInstance().getReference(Permission.class,  Long.valueOf((Integer) request.getParam(GlobalConstant.ITEMID)));
 			entityManagerSecuritySvc.getInstance().remove(permission);
 			utilSvc.addStatus(RestResponse.INFO, RestResponse.SUCCESS, "Delete Successful", response);
 		} else {
@@ -65,7 +65,7 @@ public class PermissionAdminDaoImpl extends PermissionDaoImpl implements Permiss
 			String queryStr = "SELECT p FROM RolePermission AS p WHERE p.id =:id";
 			Query query = entityManagerSecuritySvc.getInstance().createQuery(queryStr);
 		
-			query.setParameter("id", new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			query.setParameter("id", Long.valueOf((Integer) request.getParam(GlobalConstant.ITEMID)));
 			RolePermission rolePermission = (RolePermission) query.getSingleResult();
 			
 			response.addParam(GlobalConstant.ITEM, rolePermission);
@@ -80,11 +80,11 @@ public class PermissionAdminDaoImpl extends PermissionDaoImpl implements Permiss
 		RolePermission rolePermission = (RolePermission) request.getParam(GlobalConstant.ITEM);
 		
 		if (rolePermission.getRole() == null) {
-			Role role = (Role) entityManagerSecuritySvc.getInstance().getReference(Role.class,  new Long((Integer) request.getParam(GlobalConstant.PARENTID)));
+			Role role = (Role) entityManagerSecuritySvc.getInstance().getReference(Role.class,  Long.valueOf((Integer) request.getParam(GlobalConstant.PARENTID)));
 			rolePermission.setRole(role);
 		}
 		if (rolePermission.getPermission() == null) {
-			Permission permission = (Permission) entityManagerSecuritySvc.getInstance().getReference(Permission.class,  new Long((Integer) request.getParam("permissionId")));
+			Permission permission = (Permission) entityManagerSecuritySvc.getInstance().getReference(Permission.class,  Long.valueOf((Integer) request.getParam("permissionId")));
 			rolePermission.setPermission(permission);
 		}
 		
