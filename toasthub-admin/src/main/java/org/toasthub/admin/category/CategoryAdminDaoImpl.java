@@ -38,7 +38,7 @@ public class CategoryAdminDaoImpl extends CategoryDaoImpl implements CategoryAdm
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
 			
-			Category category = (Category) entityManagerDataSvc.getInstance().getReference(Category.class,  Long.valueOf((Integer) request.getParam(GlobalConstant.ITEMID)));
+			Category category = (Category) entityManagerDataSvc.getInstance().getReference(Category.class, request.getParamLong(GlobalConstant.ITEMID));
 			entityManagerDataSvc.getInstance().remove(category);
 			
 		} else {

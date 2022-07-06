@@ -73,9 +73,9 @@ public class UsersAdminDaoImpl extends UsersDaoImpl implements UsersAdminDao {
 	@Override
 	public void saveRole(RestRequest request, RestResponse response) throws Exception {
 		// get Role
-		Role role = (Role) entityManagerSecuritySvc.getInstance().getReference(Role.class, Long.valueOf((Integer) request.getParam("roleId")));
+		Role role = (Role) entityManagerSecuritySvc.getInstance().getReference(Role.class, request.getParamLong("roleId"));
 		// get User
-		User user = (User) entityManagerSecuritySvc.getInstance().getReference(User.class, Long.valueOf((Integer) request.getParam(GlobalConstant.ITEMID)));
+		User user = (User) entityManagerSecuritySvc.getInstance().getReference(User.class, request.getParamLong(GlobalConstant.ITEMID));
 		// save
 		entityManagerSecuritySvc.getInstance().merge(new UserRole(user,role));
 		
@@ -86,8 +86,8 @@ public class UsersAdminDaoImpl extends UsersDaoImpl implements UsersAdminDao {
 		String queryStr = "SELECT ur FROM UserRole AS ur WHERE ur.user.id =:uid AND ur.role.id =:rid";
 		Query query = entityManagerSecuritySvc.getInstance().createQuery(queryStr);
 	
-		query.setParameter("uid", Long.valueOf((Integer) request.getParam(GlobalConstant.ITEMID)));
-		query.setParameter("rid", Long.valueOf((Integer) request.getParam("roleId")));
+		query.setParameter("uid", request.getParamLong(GlobalConstant.ITEMID));
+		query.setParameter("rid", request.getParamLong("roleId"));
 		UserRole userRole = (UserRole) query.getSingleResult();
 		
 		// remove

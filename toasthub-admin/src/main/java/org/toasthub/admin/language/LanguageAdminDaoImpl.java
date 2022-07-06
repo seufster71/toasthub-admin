@@ -39,7 +39,7 @@ public class LanguageAdminDaoImpl extends LanguageDaoImpl implements LanguageAdm
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
 			
-			Language language = (Language) entityManagerDataSvc.getInstance().getReference(Language.class,  Long.valueOf((Integer) request.getParam(GlobalConstant.ITEMID)));
+			Language language = (Language) entityManagerDataSvc.getInstance().getReference(Language.class, request.getParamLong(GlobalConstant.ITEMID));
 			entityManagerDataSvc.getInstance().remove(language);
 			
 		} else {

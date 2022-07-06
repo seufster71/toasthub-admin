@@ -57,7 +57,7 @@ public class RoleAdminDaoImpl extends RoleDaoImpl implements RoleAdminDao {
 			// Delete rolePermissions
 			String queryStr = "SELECT rp.id FROM RolePermission AS rp WHERE rp.role.id =:id";
 			Query query = entityManagerSecuritySvc.getInstance().createQuery(queryStr);
-			query.setParameter("id", Long.valueOf((Integer) request.getParam(GlobalConstant.ITEMID)));
+			query.setParameter("id", request.getParamLong(GlobalConstant.ITEMID));
 			List<Long> permissionIds = query.getResultList();
 				
 			for(Long id : permissionIds) {
@@ -66,7 +66,7 @@ public class RoleAdminDaoImpl extends RoleDaoImpl implements RoleAdminDao {
 			}
 			
 			// Delete Role
-			Role role = (Role) entityManagerSecuritySvc.getInstance().getReference(Role.class,  Long.valueOf((Integer) request.getParam(GlobalConstant.ITEMID)));
+			Role role = (Role) entityManagerSecuritySvc.getInstance().getReference(Role.class,  request.getParamLong(GlobalConstant.ITEMID));
 			entityManagerSecuritySvc.getInstance().remove(role);
 			
 		} else {
@@ -82,7 +82,7 @@ public class RoleAdminDaoImpl extends RoleDaoImpl implements RoleAdminDao {
 			String queryStr = "SELECT r FROM UserRole AS r WHERE r.id =:id";
 			Query query = entityManagerSecuritySvc.getInstance().createQuery(queryStr);
 		
-			query.setParameter("id", Long.valueOf((Integer) request.getParam(GlobalConstant.ITEMID)));
+			query.setParameter("id", request.getParamLong(GlobalConstant.ITEMID));
 			UserRole userRole = (UserRole) query.getSingleResult();
 			
 			response.addParam(GlobalConstant.ITEM, userRole);
@@ -97,11 +97,11 @@ public class RoleAdminDaoImpl extends RoleDaoImpl implements RoleAdminDao {
 		UserRole userRole = (UserRole) request.getParam(GlobalConstant.ITEM);
 		
 		if (userRole.getRole() == null) {
-			Role role = (Role) entityManagerSecuritySvc.getInstance().getReference(Role.class,  Long.valueOf((Integer) request.getParam("roleId")));
+			Role role = (Role) entityManagerSecuritySvc.getInstance().getReference(Role.class,  request.getParamLong("roleId"));
 			userRole.setRole(role);
 		}
 		if (userRole.getUser() == null) {
-			User user = (User) entityManagerSecuritySvc.getInstance().getReference(User.class,  Long.valueOf((Integer) request.getParam("userId")));
+			User user = (User) entityManagerSecuritySvc.getInstance().getReference(User.class,  request.getParamLong("userId"));
 			userRole.setUser(user);
 		}
 		
