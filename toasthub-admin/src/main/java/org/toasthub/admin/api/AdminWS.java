@@ -33,6 +33,7 @@ import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.general.model.ServiceClass;
 import org.toasthub.core.preference.model.PrefCacheUtil;
+import org.toasthub.core.preference.model.PrefOptionValue;
 import org.toasthub.core.serviceCrawler.MicroServiceClient;
 import org.toasthub.security.common.SecurityUtils;
 import org.toasthub.security.model.MyUserPrincipal;
@@ -59,7 +60,9 @@ public class AdminWS {
 		
 		RestResponse response = new RestResponse();
 		// set defaults
-		utilSvc.setupDefaults(request);
+		PrefOptionValue globalListLimit = prefCacheUtil.getPrefOption("GLOBAL_PAGE", "GLOBAL_PAGE_PAGELIMIT",(String)request.getParam(GlobalConstant.LANG));
+		PrefOptionValue globalListLimitMax = prefCacheUtil.getPrefOption("GLOBAL_PAGE", "GLOBAL_PAGE_PAGELIMIT_MAX",(String)request.getParam(GlobalConstant.LANG));
+		utilSvc.setupDefaults(request, globalListLimit, globalListLimitMax);
 		// validate request
 		try {
 			MyUserPrincipal principal = (MyUserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
