@@ -29,7 +29,7 @@ import org.toasthub.core.preference.model.PrefName;
 import org.toasthub.core.preference.repository.PrefFormFieldDaoImpl;
 
 @Repository("PrefFormFieldAdminDao")
-@Transactional("TransactionManagerData")
+@Transactional("TransactionManagerMember")
 public class PrefFormFieldAdminDaoImpl extends PrefFormFieldDaoImpl implements PrefFormFieldAdminDao {
 
 
@@ -38,7 +38,7 @@ public class PrefFormFieldAdminDaoImpl extends PrefFormFieldDaoImpl implements P
 		PrefFormFieldName prefFormFieldName = (PrefFormFieldName) request.getParam(GlobalConstant.ITEM);
 		if (prefFormFieldName.getPrefName() == null) {
 			// get highest order
-			Object max = entityManagerDataSvc.getInstance().createQuery("SELECT max(x.sortOrder) FROM PrefFormFieldName AS x WHERE x.prefName.id =:parentId ")
+			Object max = entityManagerSvc.getInstance().createQuery("SELECT max(x.sortOrder) FROM PrefFormFieldName AS x WHERE x.prefName.id =:parentId ")
 					.setParameter("parentId", request.getParamLong(GlobalConstant.PARENTID)).getSingleResult();
 			if (max != null) {
 				int order = (int) max + 1;
@@ -46,17 +46,17 @@ public class PrefFormFieldAdminDaoImpl extends PrefFormFieldDaoImpl implements P
 			} else {
 				prefFormFieldName.setSortOrder(1);
 			}
-			PrefName prefName = (PrefName) entityManagerDataSvc.getInstance().getReference(PrefName.class, request.getParamLong("parentId"));
+			PrefName prefName = (PrefName) entityManagerSvc.getInstance().getReference(PrefName.class, request.getParamLong("parentId"));
 			prefFormFieldName.setPrefName(prefName);
 		}
-		entityManagerDataSvc.getInstance().merge(prefFormFieldName);
+		entityManagerSvc.getInstance().merge(prefFormFieldName);
 	}
 
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
-			PrefFormFieldName prefFormFieldName = (PrefFormFieldName) entityManagerDataSvc.getInstance().getReference(PrefFormFieldName.class, request.getParamLong(GlobalConstant.ITEMID));
-			entityManagerDataSvc.getInstance().remove(prefFormFieldName);
+			PrefFormFieldName prefFormFieldName = (PrefFormFieldName) entityManagerSvc.getInstance().getReference(PrefFormFieldName.class, request.getParamLong(GlobalConstant.ITEMID));
+			entityManagerSvc.getInstance().remove(prefFormFieldName);
 			
 		} else {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);
@@ -66,7 +66,7 @@ public class PrefFormFieldAdminDaoImpl extends PrefFormFieldDaoImpl implements P
 	@Override
 	public void moveSave(RestRequest request, RestResponse response) {
 		// get list of id and current order
-		List<Long> list = entityManagerDataSvc.getInstance().createQuery("SELECT x.id FROM PrefFormFieldName AS x WHERE x.prefName.id =:parentId ORDER BY x.sortOrder")
+		List<Long> list = entityManagerSvc.getInstance().createQuery("SELECT x.id FROM PrefFormFieldName AS x WHERE x.prefName.id =:parentId ORDER BY x.sortOrder")
 				.setParameter("parentId", request.getParamLong(GlobalConstant.PARENTID)).getResultList();
 		
 		// update order
@@ -92,7 +92,7 @@ public class PrefFormFieldAdminDaoImpl extends PrefFormFieldDaoImpl implements P
 		// save orderr
 		int count = 1;
 		for (Long item : updatedList) {
-			entityManagerDataSvc.getInstance().createQuery("UPDATE PrefFormFieldName set sortOrder =:orderNum WHERE id =:itemId").setParameter("itemId",item).setParameter("orderNum", count).executeUpdate();
+			entityManagerSvc.getInstance().createQuery("UPDATE PrefFormFieldName set sortOrder =:orderNum WHERE id =:itemId").setParameter("itemId",item).setParameter("orderNum", count).executeUpdate();
 			count++;
 		}
 	}

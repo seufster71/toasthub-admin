@@ -25,21 +25,21 @@ import org.toasthub.core.general.model.RestRequest;
 import org.toasthub.core.general.model.RestResponse;
 
 @Repository("CategoryAdminDao")
-@Transactional("TransactionManagerData")
+@Transactional("TransactionManagerMember")
 public class CategoryAdminDaoImpl extends CategoryDaoImpl implements CategoryAdminDao {
 	
 	//@Authorize
 	public void save(RestRequest request, RestResponse response) throws Exception {
 		Category category = (Category) request.getParam(GlobalConstant.ITEM);
-		entityManagerDataSvc.getInstance().merge(category);
+		entityManagerSvc.getInstance().merge(category);
 	}
 	
 	//@Authorize
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
 			
-			Category category = (Category) entityManagerDataSvc.getInstance().getReference(Category.class, request.getParamLong(GlobalConstant.ITEMID));
-			entityManagerDataSvc.getInstance().remove(category);
+			Category category = (Category) entityManagerSvc.getInstance().getReference(Category.class, request.getParamLong(GlobalConstant.ITEMID));
+			entityManagerSvc.getInstance().remove(category);
 			
 		} else {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);
