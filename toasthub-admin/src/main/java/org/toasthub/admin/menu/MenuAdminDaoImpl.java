@@ -27,20 +27,20 @@ import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.menu.MenuDaoImpl;
 
 @Repository("MenuAdminDao")
-@Transactional("TransactionManagerData")
+@Transactional("TransactionManagerMember")
 public class MenuAdminDaoImpl extends MenuDaoImpl implements MenuAdminDao {
 	
 	//@Authorize
 	public void save(RestRequest request, RestResponse response) throws Exception {
 		Menu menu = (Menu) request.getParam(GlobalConstant.ITEM);
-		entityManagerDataSvc.getInstance().merge(menu);
+		entityManagerSvc.getInstance().merge(menu);
 	}
 
 	//@Authorize
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
-			Menu menu = (Menu) entityManagerDataSvc.getInstance().getReference(Menu.class, request.getParamLong(GlobalConstant.ITEMID));
-			entityManagerDataSvc.getInstance().remove(menu);
+			Menu menu = (Menu) entityManagerSvc.getInstance().getReference(Menu.class, request.getParamLong(GlobalConstant.ITEMID));
+			entityManagerSvc.getInstance().remove(menu);
 		} else {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);
 		}
@@ -52,28 +52,28 @@ public class MenuAdminDaoImpl extends MenuDaoImpl implements MenuAdminDao {
 			// menu reference
 			MenuItem menuItem = (MenuItem) request.getParam(GlobalConstant.ITEM);
 			if (menuItem.getMenu() == null) {
-				Menu menu = (Menu) entityManagerDataSvc.getInstance().getReference(Menu.class, request.getParamLong(GlobalConstant.PARENTID));
+				Menu menu = (Menu) entityManagerSvc.getInstance().getReference(Menu.class, request.getParamLong(GlobalConstant.PARENTID));
 				menuItem.setMenu(menu);
 			}
-			entityManagerDataSvc.getInstance().merge(menuItem);
+			entityManagerSvc.getInstance().merge(menuItem);
 		} else if ("subSub".equals(request.getParam(GlobalConstant.ITEMTYPE))) {
 			MenuItem menuItem = (MenuItem) request.getParam(GlobalConstant.ITEM);
 			if (menuItem.getParent() == null) {
-				MenuItem p = (MenuItem) entityManagerDataSvc.getInstance().getReference(MenuItem.class, request.getParamLong(GlobalConstant.PARENTID));
+				MenuItem p = (MenuItem) entityManagerSvc.getInstance().getReference(MenuItem.class, request.getParamLong(GlobalConstant.PARENTID));
 				menuItem.setParent(p);
 				menuItem.setMenu(p.getMenu());
 			}
-			entityManagerDataSvc.getInstance().merge(menuItem);
+			entityManagerSvc.getInstance().merge(menuItem);
 		} else {
 			Menu menu = (Menu) request.getParam(GlobalConstant.ITEM);
-			entityManagerDataSvc.getInstance().merge(menu);
+			entityManagerSvc.getInstance().merge(menu);
 		}
 	}
 	
 	public void deleteSubItem(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
-			MenuItem menuItem = (MenuItem) entityManagerDataSvc.getInstance().getReference(MenuItem.class, request.getParamLong(GlobalConstant.ITEMID));
-			entityManagerDataSvc.getInstance().remove(menuItem);
+			MenuItem menuItem = (MenuItem) entityManagerSvc.getInstance().getReference(MenuItem.class, request.getParamLong(GlobalConstant.ITEMID));
+			entityManagerSvc.getInstance().remove(menuItem);
 		} else {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);
 		}

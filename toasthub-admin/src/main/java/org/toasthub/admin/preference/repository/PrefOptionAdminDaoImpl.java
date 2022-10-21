@@ -26,24 +26,24 @@ import org.toasthub.core.preference.model.PrefOptionName;
 import org.toasthub.core.preference.repository.PrefOptionDaoImpl;
 
 @Repository("PrefOptionAdminDao")
-@Transactional("TransactionManagerData")
+@Transactional("TransactionManagerMember")
 public class PrefOptionAdminDaoImpl extends PrefOptionDaoImpl implements PrefOptionAdminDao {
 
 	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
 		PrefOptionName prefOptionName = (PrefOptionName) request.getParam(GlobalConstant.ITEM);
 		if (prefOptionName.getPrefName() == null) {
-			PrefName prefName = (PrefName) entityManagerDataSvc.getInstance().getReference(PrefName.class, request.getParamLong("parentId"));
+			PrefName prefName = (PrefName) entityManagerSvc.getInstance().getReference(PrefName.class, request.getParamLong("parentId"));
 			prefOptionName.setPrefName(prefName);
 		}
-		entityManagerDataSvc.getInstance().merge(prefOptionName);
+		entityManagerSvc.getInstance().merge(prefOptionName);
 	}
 
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
-			PrefOptionName prefOptionName = (PrefOptionName) entityManagerDataSvc.getInstance().getReference(PrefOptionName.class, request.getParamLong(GlobalConstant.ITEMID));
-			entityManagerDataSvc.getInstance().remove(prefOptionName);
+			PrefOptionName prefOptionName = (PrefOptionName) entityManagerSvc.getInstance().getReference(PrefOptionName.class, request.getParamLong(GlobalConstant.ITEMID));
+			entityManagerSvc.getInstance().remove(prefOptionName);
 			
 		} else {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);
