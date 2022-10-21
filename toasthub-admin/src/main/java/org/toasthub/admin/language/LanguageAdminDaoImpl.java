@@ -26,21 +26,21 @@ import org.toasthub.core.general.model.RestResponse;
 import org.toasthub.core.language.LanguageDaoImpl;
 
 @Repository("LanguageAdminDao")
-@Transactional("TransactionManagerData")
+@Transactional("TransactionManagerMember")
 public class LanguageAdminDaoImpl extends LanguageDaoImpl implements LanguageAdminDao {
 	
 	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
 		Language language = (Language) request.getParam(GlobalConstant.ITEM);
-		entityManagerDataSvc.getInstance().merge(language);
+		entityManagerSvc.getInstance().merge(language);
 	}
 
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
 			
-			Language language = (Language) entityManagerDataSvc.getInstance().getReference(Language.class, request.getParamLong(GlobalConstant.ITEMID));
-			entityManagerDataSvc.getInstance().remove(language);
+			Language language = (Language) entityManagerSvc.getInstance().getReference(Language.class, request.getParamLong(GlobalConstant.ITEMID));
+			entityManagerSvc.getInstance().remove(language);
 			
 		} else {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);

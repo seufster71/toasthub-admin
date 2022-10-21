@@ -27,24 +27,24 @@ import org.toasthub.core.preference.model.PrefTextName;
 import org.toasthub.core.preference.repository.PrefTextDaoImpl;
 
 @Repository("PrefTextAdminDao")
-@Transactional("TransactionManagerData")
+@Transactional("TransactionManagerMember")
 public class PrefTextAdminDaoImpl extends PrefTextDaoImpl implements PrefTextAdminDao {
 
 	@Override
 	public void save(RestRequest request, RestResponse response) throws Exception {
 		PrefTextName prefTextName = (PrefTextName) request.getParam(GlobalConstant.ITEM);
 		if (prefTextName.getPrefName() == null) {
-			PrefName prefName = (PrefName) entityManagerDataSvc.getInstance().getReference(PrefName.class, request.getParamLong("parentId"));
+			PrefName prefName = (PrefName) entityManagerSvc.getInstance().getReference(PrefName.class, request.getParamLong("parentId"));
 			prefTextName.setPrefName(prefName);
 		}
-		entityManagerDataSvc.getInstance().merge(prefTextName);
+		entityManagerSvc.getInstance().merge(prefTextName);
 	}
 
 	@Override
 	public void delete(RestRequest request, RestResponse response) throws Exception {
 		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
-			PrefTextName prefTextName = (PrefTextName) entityManagerDataSvc.getInstance().getReference(PrefTextName.class, request.getParamLong(GlobalConstant.ITEMID));
-			entityManagerDataSvc.getInstance().remove(prefTextName);
+			PrefTextName prefTextName = (PrefTextName) entityManagerSvc.getInstance().getReference(PrefTextName.class, request.getParamLong(GlobalConstant.ITEMID));
+			entityManagerSvc.getInstance().remove(prefTextName);
 			
 		} else {
 			utilSvc.addStatus(RestResponse.ERROR, RestResponse.ACTIONFAILED, "Missing ID", response);
